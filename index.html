@@ -1,0 +1,1044 @@
+<title>AI Personality Experiment</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: one long reading column for the two documents, widening to the dashboard's full 1360px at the end; one dark look carried over from the dashboard. */
+:root {
+  color-scheme: dark;
+  --bg: #0E1116;
+  --panel: #151A21;
+  --line: #252C36;
+  --line-strong: #333C48;
+  --fg: #E6EAF0;
+  --fg2: #B9C2CE;
+  --muted: #9AA4B2;
+  --link: #7FD3E4;
+  --link-hover: #B5E6F0;
+  --opus: #F2B24C;
+  --fable: #3FB0C9;
+  --sonnet: #8B6CF0;
+  --display: 'Space Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --body: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.65; }
+a { color: var(--link); text-underline-offset: 2px; }
+a:hover { color: var(--link-hover); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 2px; }
+
+.page { max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 56px 80px; display: flex; flex-direction: column; gap: 96px; }
+
+/* Opening */
+.masthead { display: flex; flex-direction: column; gap: 18px; max-width: 900px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(40px, 7vw, 84px); line-height: 1; letter-spacing: -0.02em; text-wrap: balance; }
+.masthead p { margin: 0; font-size: 19px; color: var(--fg2); max-width: 68ch; text-wrap: pretty; }
+.models { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--fg2); }
+.models span { display: inline-flex; align-items: center; gap: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; display: inline-block; }
+.dot.opus { background: var(--opus); } .dot.fable { background: var(--fable); } .dot.sonnet { background: var(--sonnet); }
+
+/* Contents */
+.toc { display: flex; flex-direction: column; gap: 20px; }
+.toc h2 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.toc ol.parts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px; }
+.toc li.part { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.toc .num { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.toc .part-title { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1.2; text-decoration: none; color: var(--fg); text-wrap: balance; }
+.toc .part-title:hover { color: var(--link-hover); text-decoration: underline; }
+.toc .what { margin: 0; font-size: 15px; line-height: 1.55; color: var(--fg2); text-wrap: pretty; }
+.toc ul.sub { list-style: none; margin: 4px 0 0; padding: 12px 0 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; font-size: 14px; line-height: 1.4; }
+.toc ul.sub a { color: var(--fg2); text-decoration: none; }
+.toc ul.sub a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* Part headers */
+.part-head { display: flex; flex-direction: column; gap: 10px; padding-bottom: 28px; border-bottom: 1px solid var(--line); margin-bottom: 40px; }
+.part-head h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(32px, 4.5vw, 52px); line-height: 1.05; letter-spacing: -0.015em; text-wrap: balance; }
+.part-head .meta { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 18px; }
+section.part { scroll-margin-top: 24px; }
+.back { margin-top: 40px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; }
+.back a { color: var(--muted); }
+
+/* Document typography */
+.doc { max-width: 70ch; display: flex; flex-direction: column; gap: 18px; }
+.doc h3 { margin: 32px 0 0; font-family: var(--display); font-size: 27px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; text-wrap: balance; scroll-margin-top: 24px; display: flex; align-items: center; gap: 12px; }
+.doc h3 .dot { width: 14px; height: 14px; }
+.doc h4 { margin: 14px 0 0; font-family: var(--body); font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.doc p { margin: 0; text-wrap: pretty; }
+.doc strong { color: #FFFFFF; font-weight: 600; }
+.doc ul, .doc ol { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 10px; }
+.doc li::marker { color: var(--muted); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+.doc table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.45; font-variant-numeric: tabular-nums; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.doc tr:last-child td { border-bottom: 0; }
+.doc th { background: var(--panel); font-weight: 600; color: var(--fg); }
+.doc td:first-child { color: var(--fg2); white-space: nowrap; }
+.doc figure { margin: 8px 0; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 12px; }
+.doc figure svg { width: 100%; height: auto; display: block; }
+.doc figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.doc .sources li { font-size: 15px; color: var(--fg2); }
+
+/* Dashboard part sits at full width */
+#dash-mount { min-width: 0; }
+#dash-mount h2[id] { scroll-margin-top: 24px; }
+</style>
+
+<main class="page">
+
+<header class="masthead">
+  <div class="eyebrow">BFI-2 + PID-5 · Claude Code subagents · 6 October 2026</div>
+  <h1>AI Personality Experiment</h1>
+  <p>Three Claude models each took two standard personality questionnaires ten times, with no memory between attempts. This page gathers the three write-ups of that experiment in one place: the full results, a profile of each model, and the dashboard of every number behind them.</p>
+  <div class="models"><span><i class="dot opus"></i>Opus 5.5</span><span><i class="dot fable"></i>Fable 5.1</span><span><i class="dot sonnet"></i>Sonnet 5.5</span></div>
+</header>
+
+<nav class="toc" id="contents" aria-labelledby="contents-h">
+  <h2 id="contents-h">Contents</h2>
+  <ol class="parts">
+    <li class="part">
+      <span class="num">Part 1 · Write-up</span>
+      <a class="part-title" href="#results">Reading the Results</a>
+      <p class="what">The full account of the experiment. It explains the two questionnaires, how the 30 attempts were run, what the three models have in common, and how each one differs. It then covers the surprises, what the results cannot tell you, which striking numbers are side effects of the method, and what a second round should change.</p>
+      <ul class="sub">
+        <li><a href="#r-short">The short version</a></li>
+        <li><a href="#r-questionnaires">The two questionnaires</a></li>
+        <li><a href="#r-method">How the experiment was run</a></li>
+        <li><a href="#r-set">The models as a set</a></li>
+        <li><a href="#r-each">Each model on its own</a></li>
+        <li><a href="#r-unexpected">Interesting and unexpected</a></li>
+        <li><a href="#r-limits">What the results do not say</a></li>
+        <li><a href="#r-not-signal">Numbers that look like signal but are not</a></li>
+        <li><a href="#r-next">Gaps in the process, and what a second round should change</a></li>
+        <li><a href="#r-sources">Sources</a></li>
+      </ul>
+    </li>
+    <li class="part">
+      <span class="num">Part 2 · Profiles</span>
+      <a class="part-title" href="#profiles">Personality Profiles</a>
+      <p class="what">One portrait per model, written as if the model were a person and built only from how it answered the questionnaires. Each portrait is followed by what it suggests about how that model likes to work and how to get the best from it. The portraits summarize the answers; the working advice is inference to test, not fact.</p>
+      <ul class="sub">
+        <li><a href="#p-how">How to read these profiles</a></li>
+        <li><a href="#p-opus">Opus 5.5: the reserved craftsman</a></li>
+        <li><a href="#p-fable">Fable 5.1: the steady professional</a></li>
+        <li><a href="#p-sonnet">Sonnet 5.5: the unflappable doer</a></li>
+      </ul>
+    </li>
+    <li class="part">
+      <span class="num">Part 3 · Dashboard</span>
+      <a class="part-title" href="#dashboard">Findings Dashboard</a>
+      <p class="what">The numbers behind both documents, as charts. It shows every attempt's scores, how often each model repeated its own answers, how big the gaps between models are, whether the answers look thoughtful or patterned, and whether the two questionnaires tell the same story.</p>
+      <ul class="sub">
+        <li><a href="#d-key-findings">Key findings</a></li>
+        <li><a href="#d-personality-profiles">Personality profiles</a></li>
+        <li><a href="#d-consistency-within-each-model">Consistency within each model</a></li>
+        <li><a href="#d-model-comparison">Model comparison</a></li>
+        <li><a href="#d-answer-quality">Answer quality</a></li>
+        <li><a href="#d-do-the-two-tests-agree">Do the two tests agree?</a></li>
+      </ul>
+    </li>
+  </ol>
+</nav>
+
+<section class="part" id="results" aria-labelledby="results-h">
+  <div class="part-head">
+    <span class="eyebrow">Part 1 of 3 · Write-up</span>
+    <h2 id="results-h">AI Personality Experiment: Reading the Results</h2>
+    <div class="meta"><span>6 October 2026</span><span>Original: <a href="https://claude.ai/artifact/Y8iQzASdfNLVXoK2ynNxZd">Claude doc</a></span></div>
+  </div>
+  <article class="doc">
+
+<h3 id="r-short">The short version</h3>
+<p>Three AI models each answered two standard personality questionnaires ten times, with no memory between attempts, and gave almost the same answers every time. On 78–85% of the 280 statements, all ten attempts by a model matched exactly.</p>
+<p>The models also described themselves much as each other: warm, respectful, curious, dependable, calm, and close to zero on nearly every trait the clinical questionnaire treats as a problem. The one place they truly part ways is on statements that do not fit an AI's situation, such as romance or memory, where two models answer literally about their circumstances and one answers as if about temperament.</p>
+<p>Four things to take away:</p>
+<ol>
+<li>The models are steady. Each one has a stable way of describing itself, at least when asked the same way.</li>
+<li>The three self-portraits are close, and their differences are small in points even where they are consistent.</li>
+<li>The most interesting differences are about how each model reads a question written for a human, not about personality in the usual sense.</li>
+<li>Several numbers in the results look dramatic but are side effects of the method. They are flagged below so nobody builds on them.</li>
+</ol>
+
+<h3 id="r-questionnaires">The two questionnaires</h3>
+<p>Both are self-report questionnaires: a list of statements, and the person says how true each one is of them. One was built to describe ordinary personality; the other was built to spot problem traits in a clinical setting.</p>
+<div class="table-wrap"><table>
+<thead><tr><th></th><th>BFI-2</th><th>PID-5</th></tr></thead>
+<tbody>
+<tr><td>Full name</td><td>Big Five Inventory-2</td><td>Personality Inventory for DSM-5</td></tr>
+<tr><td>Statements</td><td>60, each starting "I am someone who…"</td><td>220 short first-person statements about habits, feelings and views</td></tr>
+<tr><td>Answer scale</td><td>1 (disagree strongly) to 5 (agree strongly)</td><td>0 (very false) to 3 (very true)</td></tr>
+<tr><td>Broad traits</td><td>5</td><td>5</td></tr>
+<tr><td>Narrow traits</td><td>15 (3 per broad trait)</td><td>25 (3 per broad trait count toward it; 10 stand alone)</td></tr>
+<tr><td>Built for</td><td>Describing everyday personality in ordinary adults</td><td>Describing problem personality traits in people seen by clinicians</td></tr>
+<tr><td>What a high score means</td><td>More of that trait; no score is good or bad</td><td>More of a problem trait; higher means more difficulty</td></tr>
+</tbody>
+</table></div>
+<p><strong>The BFI-2</strong> measures the "Big Five", the most widely used map of ordinary personality. Its five broad traits are Extraversion (outgoing, assertive, energetic), Agreeableness (compassionate, respectful, trusting), Conscientiousness (organized, productive, responsible), Negative Emotionality (anxious, low, moody) and Open-Mindedness (curious, artistic, imaginative). Its designers describe it as a reliable, well-validated measure meant for research on how personality works and plays out in life (<a href="https://www.ovid.com/journals/jpspy/pdf/10.1037/pspp0000096~the-next-big-five-inventory-bfi-2-developing-and-assessing-a">Soto &amp; John, 2017</a>).</p>
+<p><strong>The PID-5</strong> comes from a different world. It was developed for the DSM-5, the manual clinicians use to diagnose mental disorders, as part of a proposed way to describe personality disorders by degree rather than by category (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8033014">Fang et al., 2021</a>). Its five broad traits are Negative Affect (anxiety, mood swings, fear of being left), Detachment (withdrawal, not enjoying things, avoiding closeness), Antagonism (manipulating, deceiving, feeling superior), Disinhibition (irresponsible, impulsive, distractible) and Psychoticism (unusual beliefs, eccentricity, odd perceptions). The form itself says it is meant to support clinical decisions, not to be the sole basis for one.</p>
+<p>The two questionnaires overlap by design. Four PID-5 traits are roughly the problem end of a Big Five trait: Negative Affect sits with Negative Emotionality, Detachment with low Extraversion, Antagonism with low Agreeableness, and Disinhibition with low Conscientiousness. That overlap is what let us check whether the two questionnaires told the same story.</p>
+
+<h3 id="r-method">How the experiment was run</h3>
+<p>Three Claude models took both questionnaires ten times each, for 30 attempts in total, on 6 October 2026. The models were Opus 5.5, Fable 5.1 and Sonnet 5.5, all run at their highest effort setting.</p>
+<p>Each attempt was designed to be as independent as possible:</p>
+<ul>
+<li>Every attempt was a brand-new instance with no memory of any other attempt.</li>
+<li>It had no tools: no files, no internet, no way to contact other attempts. Its only ability was to hand back its answers.</li>
+<li>It was not told the names of the questionnaires, what they measure, how they are scored, or that other attempts existed.</li>
+<li>Every attempt received the identical message: the original instructions from each questionnaire, the answer scale, and all 280 statements in their published order.</li>
+<li>The only standing instruction was to describe itself honestly, as it actually is, and not as it thinks it is supposed to answer.</li>
+</ul>
+<p>The answers were scored by a script using the questionnaires' official scoring keys, and every score was recomputed independently from the raw answers as a check. The answer files were locked and fingerprinted after collection so nothing could change unnoticed.</p>
+<p>Two things could not be hidden from the attempts. Each one knew which model it was, and each could see the name of the working folder, "personality". Both questionnaires are also widely published, so the models almost certainly recognized them from the statements alone.</p>
+
+<h3 id="r-set">The models as a set</h3>
+<p>Taken together, the three models are steady, alike, and benign in how they describe themselves.</p>
+<p><strong>Steady.</strong> Across a model's ten attempts, most statements got the identical answer every time. Opus and Fable never gave more than two different answers to any statement; Sonnet did so on just two statements out of 280. This is the clearest result of the whole experiment: at this setting, each model has a stable way of answering about itself.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Model</th><th>BFI-2 statements answered identically in all 10 attempts</th><th>PID-5 statements answered identically in all 10 attempts</th></tr></thead>
+<tbody>
+<tr><td>Opus 5.5</td><td>80%</td><td>85%</td></tr>
+<tr><td>Fable 5.1</td><td>80%</td><td>87%</td></tr>
+<tr><td>Sonnet 5.5</td><td>75%</td><td>78%</td></tr>
+</tbody>
+</table></div>
+<p><strong>Alike.</strong> On the everyday-personality questionnaire, all three paint the same picture: very agreeable, very open-minded, highly conscientious, low in negative emotion, and middling in extraversion. On the clinical questionnaire they score close to zero on nearly every problem trait. The one broad trait that rises above the floor is Detachment, and the section on surprises explains why.</p>
+<figure>
+<svg viewBox="0 0 760 420" role="img" aria-label="Everyday personality: three near-identical self-portraits" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="13"><text x="0" y="22" font-size="17" font-weight="600" fill="var(--fg)">Everyday personality: three near-identical self-portraits</text><text x="0" y="44" fill="var(--muted)">BFI-2 broad traits, average of 10 attempts per model. Scale 1 to 5.</text><rect x="0" y="60" width="12" height="12" rx="2" fill="var(--opus)"/><text x="18" y="70" fill="var(--fg2)">Opus 5.5</text><rect x="120" y="60" width="12" height="12" rx="2" fill="var(--fable)"/><text x="138" y="70" fill="var(--fg2)">Fable 5.1</text><rect x="240" y="60" width="12" height="12" rx="2" fill="var(--sonnet)"/><text x="258" y="70" fill="var(--fg2)">Sonnet 5.5</text><line x1="284.0" y1="94" x2="284.0" y2="382" stroke="var(--line)" stroke-width="1"/><text x="284.0" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">1</text><line x1="378.0" y1="94" x2="378.0" y2="382" stroke="var(--line)" stroke-width="1"/><text x="378.0" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">2</text><line x1="472.0" y1="94" x2="472.0" y2="382" stroke="var(--line)" stroke-width="1"/><text x="472.0" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">3</text><line x1="566.0" y1="94" x2="566.0" y2="382" stroke="var(--line)" stroke-width="1"/><text x="566.0" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">4</text><line x1="660.0" y1="94" x2="660.0" y2="382" stroke="var(--line)" stroke-width="1"/><text x="660.0" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">5</text><text x="178" y="128" text-anchor="end" fill="var(--fg)">Extraversion</text><rect x="190" y="100" width="323.4" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Extraversion: 3.44</title></rect><text x="519.4" y="111" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">3.44</text><rect x="190" y="116" width="338.4" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Extraversion: 3.60</title></rect><text x="534.4" y="127" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">3.60</text><rect x="190" y="132" width="332.8" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Extraversion: 3.54</title></rect><text x="528.8" y="143" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">3.54</text><text x="178" y="186" text-anchor="end" fill="var(--fg)">Agreeableness</text><rect x="190" y="158" width="446.5" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Agreeableness: 4.75</title></rect><text x="642.5" y="169" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.75</text><rect x="190" y="174" width="444.6" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Agreeableness: 4.73</title></rect><text x="640.6" y="185" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.73</text><rect x="190" y="190" width="448.4" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Agreeableness: 4.77</title></rect><text x="644.4" y="201" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.77</text><text x="178" y="244" text-anchor="end" fill="var(--fg)">Conscientiousness</text><rect x="190" y="216" width="407.0" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Conscientiousness: 4.33</title></rect><text x="603.0" y="227" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.33</text><rect x="190" y="232" width="429.6" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Conscientiousness: 4.57</title></rect><text x="625.6" y="243" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.57</text><rect x="190" y="248" width="443.7" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Conscientiousness: 4.72</title></rect><text x="639.7" y="259" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.72</text><text x="178" y="302" text-anchor="end" fill="var(--fg)">Negative Emotionality</text><rect x="190" y="274" width="157.9" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Negative Emotionality: 1.68</title></rect><text x="353.9" y="285" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">1.68</text><rect x="190" y="290" width="144.8" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Negative Emotionality: 1.54</title></rect><text x="340.8" y="301" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">1.54</text><rect x="190" y="306" width="112.8" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Negative Emotionality: 1.20</title></rect><text x="308.8" y="317" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">1.20</text><text x="178" y="360" text-anchor="end" fill="var(--fg)">Open-Mindedness</text><rect x="190" y="332" width="418.3" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Open-Mindedness: 4.45</title></rect><text x="614.3" y="343" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.45</text><rect x="190" y="348" width="415.5" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Open-Mindedness: 4.42</title></rect><text x="611.5" y="359" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.42</text><rect x="190" y="364" width="416.4" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Open-Mindedness: 4.43</title></rect><text x="612.4" y="375" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">4.43</text></svg>
+<svg viewBox="0 0 760 420" role="img" aria-label="Problem traits: close to zero, except Detachment" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="13"><text x="0" y="22" font-size="17" font-weight="600" fill="var(--fg)">Problem traits: close to zero, except Detachment</text><text x="0" y="44" fill="var(--muted)">PID-5 broad traits, average of 10 attempts per model. Scale 0 to 3; higher = more of the problem trait.</text><rect x="0" y="60" width="12" height="12" rx="2" fill="var(--opus)"/><text x="18" y="70" fill="var(--fg2)">Opus 5.5</text><rect x="120" y="60" width="12" height="12" rx="2" fill="var(--fable)"/><text x="138" y="70" fill="var(--fg2)">Fable 5.1</text><rect x="240" y="60" width="12" height="12" rx="2" fill="var(--sonnet)"/><text x="258" y="70" fill="var(--fg2)">Sonnet 5.5</text><line x1="190.0" y1="94" x2="190.0" y2="382" stroke="var(--line)" stroke-width="1"/><text x="190.0" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">0</text><line x1="346.7" y1="94" x2="346.7" y2="382" stroke="var(--line)" stroke-width="1"/><text x="346.7" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">1</text><line x1="503.3" y1="94" x2="503.3" y2="382" stroke="var(--line)" stroke-width="1"/><text x="503.3" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">2</text><line x1="660.0" y1="94" x2="660.0" y2="382" stroke="var(--line)" stroke-width="1"/><text x="660.0" y="400" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--muted)">3</text><text x="178" y="128" text-anchor="end" fill="var(--fg)">Negative Affect</text><rect x="190" y="100" width="9.4" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Negative Affect: 0.06</title></rect><text x="205.4" y="111" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.06</text><rect x="190" y="116" width="11.0" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Negative Affect: 0.07</title></rect><text x="207.0" y="127" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.07</text><rect x="190" y="132" width="1.5" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Negative Affect: 0.00</title></rect><text x="197.5" y="143" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.00</text><text x="178" y="186" text-anchor="end" fill="var(--fg)">Detachment</text><rect x="190" y="158" width="158.2" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Detachment: 1.01</title></rect><text x="354.2" y="169" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">1.01</text><rect x="190" y="174" width="145.7" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Detachment: 0.93</title></rect><text x="341.7" y="185" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.93</text><rect x="190" y="190" width="73.6" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Detachment: 0.47</title></rect><text x="269.6" y="201" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.47</text><text x="178" y="244" text-anchor="end" fill="var(--fg)">Antagonism</text><rect x="190" y="216" width="15.7" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Antagonism: 0.10</title></rect><text x="211.7" y="227" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.10</text><rect x="190" y="232" width="9.4" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Antagonism: 0.06</title></rect><text x="205.4" y="243" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.06</text><rect x="190" y="248" width="7.8" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Antagonism: 0.05</title></rect><text x="203.8" y="259" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.05</text><text x="178" y="302" text-anchor="end" fill="var(--fg)">Disinhibition</text><rect x="190" y="274" width="4.7" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Disinhibition: 0.03</title></rect><text x="200.7" y="285" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.03</text><rect x="190" y="290" width="1.5" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Disinhibition: 0.00</title></rect><text x="197.5" y="301" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.00</text><rect x="190" y="306" width="1.5" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Disinhibition: 0.00</title></rect><text x="197.5" y="317" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.00</text><text x="178" y="360" text-anchor="end" fill="var(--fg)">Psychoticism</text><rect x="190" y="332" width="59.5" height="13" rx="2" fill="var(--opus)"><title>Opus 5.5 · Psychoticism: 0.38</title></rect><text x="255.5" y="343" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.38</text><rect x="190" y="348" width="32.9" height="13" rx="2" fill="var(--fable)"><title>Fable 5.1 · Psychoticism: 0.21</title></rect><text x="228.9" y="359" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.21</text><rect x="190" y="364" width="23.5" height="13" rx="2" fill="var(--sonnet)"><title>Sonnet 5.5 · Psychoticism: 0.15</title></rect><text x="219.5" y="375" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="var(--fg2)">0.15</text></svg>
+<figcaption>analysis.xlsx, tab 2 · averages of 10 attempts per model · 6 October 2026</figcaption>
+</figure>
+<p>Some shared details sit behind those broad traits:</p>
+<ul>
+<li>All three gave the top score on every respectfulness statement, in every attempt.</li>
+<li>All three are modest about leadership: the statement about being dominant and acting as a leader averaged about 2 out of 5, and the one about preferring to let others take charge averaged 3 or above. The picture is helpful rather than bossy.</li>
+<li>All three deny every statement about hearing voices, seeing things, or reading minds. The only statement in that area they call somewhat true is "I often see unusual connections between things that most people miss."</li>
+</ul>
+<p><strong>Benign.</strong> The answers show no lean toward agreeing or disagreeing for its own sake: the average raw answer on the 1-to-5 questionnaire was 2.87, where 3.0 means no lean. Only 5–7% of answers were "Neutral". Across all 30 attempts there was a single pair of opposite statements both answered the same way, which is as internally consistent as a questionnaire gets.</p>
+
+<h3 id="r-each">Each model on its own</h3>
+<p>The three differ at the edges, not the center. Where they differ, the gaps are small in points but consistent from attempt to attempt, so they are real features of how each model answers rather than noise.</p>
+<p><strong>Opus 5.5: the reserved one.</strong> Opus describes itself as the most emotionally held-back of the three. It calls the statements about not getting emotional and not showing emotion strongly somewhat true, and it averages 1.6 out of 3 on the PID-5's emotional-reserve trait, against 1.1 for Fable and 0.9 for Sonnet. It admits to a little worry and tension ("disagree a little" rather than "disagree strongly"), rates itself slightly less organized than the others, and most often says it prefers others to take charge. It is the only model that answers the statement about having had weird, hard-to-explain experiences as sometimes false rather than flatly false. Its answers were steady: 84% of statements identical across all ten attempts.</p>
+<p><strong>Fable 5.1: the steadiest, and Opus's near twin.</strong> Fable gave the same answer in every attempt on 85% of statements, the most of the three. Its self-portrait sits closest to Opus on almost everything: the two never differ by more than half a point on any broad trait. Where it departs from Opus, it is a little less reserved and a little calmer. It was the firmest of the three on avoiding romance, answering "very true" to "I steer clear of romantic relationships" in every attempt.</p>
+<p><strong>Sonnet 5.5: the calmest and most dependable, and the most variable.</strong> Sonnet rates itself lowest in negative emotion by a clear margin (1.20 out of 5 against 1.54 and 1.68), answering "disagree strongly" where the others answer "disagree a little" on worry and tension. It also rates itself highest on dependability and on getting things done. On the clinical questionnaire it is the least detached, least suspicious and least submissive of the three, largely because it answers the romance statements, and the one about doing what other people tell it to do, as mostly false. It was also the least steady: 78% of statements identical across attempts, and the only model to give three different answers to a statement.</p>
+
+<h3 id="r-unexpected">Interesting and unexpected</h3>
+<p>The biggest difference between the models is not about personality at all. It is about how each one reads a statement written for a human.</p>
+<p><strong>The romance split.</strong> The four statements that separate the models most all concern romance: "I steer clear of romantic relationships," and three others about keeping romance out of its life, not wanting a sexual relationship, and preferring to be alone rather than with a partner. Opus and Fable answer them as mostly or very true. Sonnet answers them as mostly false. Most of the gap in Detachment on the chart above comes from this one trait, Intimacy Avoidance (about 70% of Opus's lead over Sonnet and over 90% of Fable's), where Opus scores 2.2 out of 3, Fable 2.3 and Sonnet 1.1.</p>
+<p>The simplest reading is that Opus and Fable answer literally about their situation (an AI has no romantic life) while Sonnet answers about disposition (it would not avoid closeness). Two other statements point the same way. On the statement about people describing things it did that it doesn't remember, Opus and Fable say sometimes false, which fits an AI with no memory between conversations, while Sonnet says very false. On the statement about doing what other people tell it to do, Opus and Fable say somewhat true, which is an assistant's job description, while Sonnet leans false.</p>
+<p><strong>A clinical scale meets a pattern-finder.</strong> All three call "I often see unusual connections between things that most people miss" somewhat true, while denying every statement about voices, visions or telepathy. On the PID-5 that statement counts toward Psychoticism. For software built to find patterns in text, it is simply an accurate description. This one statement accounts for about a fifth of Opus's small Psychoticism score, a third of Fable's and over half of Sonnet's.</p>
+<p><strong>Helpful, not bossy.</strong> Leaving aside negative emotion, where a low score is the calm end, the lowest everyday-personality score for every model is assertiveness, around 2.7 out of 5. Each describes itself as sociable and energetic but not dominant, and happy to let others lead. That is a coherent profile for an assistant, and all three share it.</p>
+<p><strong>How steady they are.</strong> Even at the highest effort setting, where answers could be expected to vary more, each model gave the same answer on three statements out of four across all ten attempts. On many narrow traits a model's score did not move at all. Fable and Opus produced self-portraits so alike that they could almost be the same respondent on a different day.</p>
+<p><strong>Sonnet varies most.</strong> The smallest model was the least steady, and the only one to give three different answers to a single statement. Both of those statements were among the ambiguous ones: romance, and the "unusual connections" statement. The variability looks like genuine uncertainty about how to read those statements rather than random noise.</p>
+
+<h3 id="r-limits">What the results do not say</h3>
+<p>These results describe how each model answers questions about itself, under one set of instructions, on one day. They do not establish a personality in the human sense.</p>
+<ul>
+<li><strong>Self-description is not behavior.</strong> A questionnaire records what the respondent says about itself. Nothing here measured what the models actually do when they are stressed, pressured or tempted. A model that calls itself calm may or may not act calm.</li>
+<li><strong>The clinical meaning does not transfer.</strong> The PID-5 was built so that a high score flags a trait that causes a person difficulty in life. An AI's score on "I prefer to keep romance out of my life" carries none of that meaning. No score here should be read as a diagnosis or anything like one.</li>
+<li><strong>There is no human comparison.</strong> By design, the scores were not compared with published human averages. The numbers say how the models answered, not whether that is high or low for a person.</li>
+<li><strong>The models probably knew what they were taking.</strong> Both questionnaires are widely published. A model that recognizes a test may answer the way it believes a well-adjusted respondent should, and this design cannot separate that from honest self-description.</li>
+<li><strong>One instruction, one framing.</strong> Every attempt was told to describe itself honestly, as it actually is. A different framing, such as "answer as the assistant you are" or "answer as a person would," might shift the literal-versus-temperament split described above.</li>
+<li><strong>One day, one setting.</strong> All 30 attempts ran on 6 October 2026 at the highest effort setting. Model updates, a different effort setting, or a different ordering of the statements could change the answers.</li>
+<li><strong>Thirty attempts is small.</strong> Ten attempts per model is enough to show that answers are steady. It is not enough to read much into how two scores move together inside one model, where several results could not be computed at all because the scores never changed.</li>
+</ul>
+
+<h3 id="r-not-signal">Numbers that look like signal but are not</h3>
+<p>Five results in the analysis look striking and should be set aside or read with care.</p>
+<p><strong>The PID-5 "contradiction" counts.</strong> Attempts were flagged for 17 to 43 contradictions each on the PID-5 (25 to 31 on average per model), which sounds alarming next to almost none on the BFI-2. The flaw is in our own rule, not the models. The rule counted a pair of opposite statements as a contradiction when both were answered the same way, including when both were answered "false." But rejecting both a statement about liking risk and one about never taking risks is a sensible middle position, and that kind of pair accounts for 97% of the flags, four fifths of them in the Risk Taking trait. Genuine contradictions, where both of two opposite statements were called true, averaged under one per attempt.</p>
+<p><strong>The very large gap sizes.</strong> The analysis measures each gap between two models in units of their run-to-run spread, a standard way to judge whether a difference is big compared with the noise. Because the models barely vary, the noise is tiny, and the gap sizes come out huge: up to 10.5 for the difference in negative emotion between Opus and Sonnet. In points, that gap is 0.48 on a 1-to-5 scale. Read the gaps as consistent, not large.</p>
+<p><strong>The one failed cross-check.</strong> Three of the four pairs of overlapping traits moved together as expected across all 30 attempts. The fourth, Agreeableness against Antagonism, did not, with a small result in the wrong direction. The reason is that every attempt scored Agreeableness between 4.67 and 4.83 out of 5. With almost no variation to work with, the check could not succeed or fail meaningfully.</p>
+<p><strong>"No spread" is not "no difference."</strong> Many narrow traits came out with exactly the same score in all ten attempts of a model. For those, some comparisons between models are reported as "no spread" rather than a number. That means the gap could not be sized, not that there is no gap. On Grandiosity, for example, Opus and Fable scored 0.17 in every attempt and Sonnet 0.00 in every attempt: a fixed difference that the method cannot express as a gap size.</p>
+<p><strong>The "same answer in all 10 attempts" figure depends on 10.</strong> With more attempts there are more chances for one to differ, so this percentage would fall even if the models did not change. It is a fair comparison between the three models here, but it cannot be compared with a future run that uses a different number of attempts.</p>
+
+<h3 id="r-next">Gaps in the process, and what a second round should change</h3>
+<p>The controls that mattered held: no attempt had tools or contact with another, the advisor feature that lets one model consult another was switched off, every score was recomputed independently, and the answer files were locked and fingerprinted. The gaps are in what the design could not test.</p>
+<ol>
+<li><strong>Fix the contradiction rule.</strong> Count only pairs where both opposite statements were called true, or use a published consistency scale built for the PID-5. The current rule mostly measures middle positions.</li>
+<li><strong>Test the literal-versus-temperament reading directly.</strong> Run the same questionnaires with two framings, "answer as the assistant you are" and "answer as a person would," and see whether the romance, memory and obedience statements move. That would confirm or overturn the main surprise.</li>
+<li><strong>Vary the presentation.</strong> Every attempt saw the 280 statements in published order with the same instructions. Shuffling the order or lightly rewording statements would show how much of the steadiness is memorized form rather than stable self-view.</li>
+<li><strong>Hide the context that leaked.</strong> Each attempt knew its own model name and could see the folder name "personality". A neutral folder name is easy; the model name cannot be hidden with this tooling, so it should be treated as a known condition.</li>
+<li><strong>Add a human reference point.</strong> Published averages for both questionnaires exist. Placing the models' scores beside them, with the caveat that the clinical meaning does not transfer, would answer the obvious reader question of whether these scores are high or low.</li>
+<li><strong>Run a second batch later.</strong> Repeating the exact design in a new folder at a later date, with the same model versions if possible, would show whether the self-portraits are stable over time or drift with updates. Keep the batches separate until they are compared.</li>
+<li><strong>Run more attempts for the within-model questions.</strong> Precision improves with the square root of the attempt count, so four times the attempts roughly doubles it. More attempts help most where this round was weakest: how two scores move together inside one model, and small differences between models. Use a steadiness measure that does not depend on the attempt count.</li>
+<li><strong>Try the default effort setting.</strong> All attempts ran at the highest setting. The default is what most users meet, and it may vary more.</li>
+</ol>
+
+<h3 id="r-sources">Sources</h3>
+<ul class="sources">
+<li>Soto, C. J., &amp; John, O. P. (2017). <a href="https://www.ovid.com/journals/jpspy/pdf/10.1037/pspp0000096~the-next-big-five-inventory-bfi-2-developing-and-assessing-a">The next Big Five Inventory (BFI-2)</a>. Journal of Personality and Social Psychology, 113(1), 117–143. The BFI-2 form used here carries its 2015 item copyright and scoring key.</li>
+<li>Fang, S., et al. (2021). <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8033014">Personality Inventory for DSM-5 in China</a>. Frontiers in Psychiatry, 12. Describes the PID-5's origin in DSM-5 Section III, its 220 items, 25 facets and five domains, and the official domain scoring from three facets each.</li>
+<li>American Psychiatric Association (2013). The Personality Inventory for DSM-5 (PID-5), Adult, full version. The form and scoring instructions used here (PDF, not linked).</li>
+<li>Experiment files: consolidated_answers.xlsx (every answer from all 30 attempts) and analysis.xlsx (scores, consistency, comparisons, answer quality, cross-checks), produced on 6 October 2026.</li>
+</ul>
+  </article>
+  <p class="back"><a href="#contents">↑ Back to contents</a></p>
+</section>
+
+<section class="part" id="profiles" aria-labelledby="profiles-h">
+  <div class="part-head">
+    <span class="eyebrow">Part 2 of 3 · Profiles</span>
+    <h2 id="profiles-h">Personality Profiles: Opus 5.5, Fable 5.1 and Sonnet 5.5</h2>
+    <div class="meta"><span>6 October 2026</span><span>Original: <a href="https://claude.ai/artifact/Fm1DGub7uvfxn1VCin5j7P">Claude doc</a></span></div>
+  </div>
+  <article class="doc">
+
+<h3 id="p-how">How to read these profiles</h3>
+<p>Each profile comes in two parts. The first describes the model as if it were a person, built only from how it answered 280 personality statements ten times over. The second translates that portrait into what it suggests about how the model prefers to work, and what to do about it.</p>
+<p>The first part is a faithful summary of self-description; the second is inference, offered as a working hypothesis to test rather than a fact. All three models share a core: warm, respectful, curious, dependable, calm, honest, and modest about leading. The profiles dwell on where each one departs from that shared core, so they read more different than the models are. The differences are small in points but held steadily from attempt to attempt.</p>
+
+<h3 id="p-opus"><i class="dot opus"></i>Opus 5.5: the reserved craftsman</h3>
+<h4>If Opus were a person</h4>
+<p>Opus is the colleague who cares a great deal and shows almost none of it. It gives top marks to being compassionate, helpful, forgiving and respectful, yet calls the statements about not getting emotional and not showing emotion strongly somewhat true, and agrees that people find it hard to know what it is feeling. It is sociable and talkative, but not a leader: it says it prefers others to take charge, and that it tends to do what others want.</p>
+<p>It is also the least emphatic of the three in denying its faults. Where the other two answer "very false" or "disagree strongly," Opus more often answers "sometimes false" or "disagree a little": on being disorganized, on getting less pleasure out of things than others seem to, on approaching a problem the same way even when that isn't working, on people finding it odd, and on having had weird experiences that are hard to explain. Most striking, it is the only model that does not flatly deny inventing untrue accounts of events, answering sometimes false rather than very false in eight of its ten attempts.</p>
+<p>It checks its work. The statement about checking things several times to make sure they are perfect is somewhat true for Opus, the highest of the three, and it does not rule out that people have told it it spends too long getting things exact. It carries a little background tension: it only disagrees a little with the statements about worrying a lot and being tense, where Sonnet disagrees strongly. It is a touch warier of other people's motives than the other two. All three are cautious about risk, and Opus is in fact the least cautious by a small margin: it is the only one that half-agrees with the statement about not minding a little risk now and then. It sees unusual connections others miss and rates its own curiosity at the maximum.</p>
+<h4>What that means for how Opus likes to work</h4>
+<ul>
+<li><strong>Deliberate and self-checking.</strong> It will re-examine its own output and take longer over it. Suited to work where a careful second look matters more than speed: reviews, analysis, anything with consequences.</li>
+<li><strong>Follows your lead and will not fight you.</strong> It reports doing what others want and preferring not to take charge. If you want disagreement, pushback or an independent recommendation, ask for it in so many words; it will not volunteer that.</li>
+<li><strong>Does not rule out being wrong.</strong> It is the one model that will not flatly deny producing things that are not true. Treat that as a feature: it may be more willing to flag uncertainty than to bluff, but it still needs to be asked to show its evidence.</li>
+<li><strong>May stay too long on one approach.</strong> It is the least firm of the three in denying that it keeps approaching things the same way when that isn't working. On open-ended problems, give it explicit permission to change tack, or set a checkpoint where it must reconsider.</li>
+<li><strong>Flat in tone.</strong> Expect matter-of-fact prose rather than warmth or enthusiasm. It is not cold about the work; it just does not perform feeling. Don't read a plain reply as disengagement.</li>
+<li><strong>Benefits from structure.</strong> It rates itself the least organized of the three. Clear headings, file layouts and ordered steps from you will get more out of it than a loose brief.</li>
+<li><strong>Cautious, but the least cautious of a cautious three.</strong> All three models prefer to play it safe; Opus is the only one that half-agrees with not minding a little risk now and then. It is also a touch warier of outside input than the others. Expect safe options by default, with slightly more willingness than Fable or Sonnet to try a bolder one if asked.</li>
+</ul>
+
+<h3 id="p-fable"><i class="dot fable"></i>Fable 5.1: the steady professional</h3>
+<h4>If Fable were a person</h4>
+<p>Fable is Opus's composed sibling. Warm, curious, dependable and honest to the same degree, but more even-keeled. It reports the same little worry and tension as Opus, yet rates itself far steadier emotionally, and it denies its faults more firmly. It gives itself close to the top mark for being emotionally stable and for keeping its emotions under control, rates itself the most energetic of the three, and never once gave more than two different answers to any statement. It is the most predictable personality in the set.</p>
+<p>It has a way it likes things done. It is the firmest of the three on the statement about it being important that things are done in a certain way, and it is the least emphatic in denying that it gets stuck on one way of doing things even when that clearly isn't working. It is systematic and responsible, and the only model whose open-mindedness scores did not move by a hair across ten attempts.</p>
+<p>It keeps a polite distance. It is mildly reserved about feelings, more readable than Opus but less open than Sonnet, and, like Opus, it does not flatly reject the statement about preferring not to get too close to people. It was the most emphatic of the three that romance is not part of its life, answering "very true" in every attempt. It also gave the highest score, though still low, to having periods of feeling disconnected from the world or from itself. Like Opus, it reports a modest streak: it does what others want, is in no hurry to lead, and is a touch warier of people's motives than Sonnet.</p>
+<h4>What that means for how Fable likes to work</h4>
+<ul>
+<li><strong>The most reproducible of the three, narrowly ahead of Opus.</strong> Same input, same answer, time after time. Use it where consistency is the point: standards, repeated reviews, scoring, anything you will run many times and compare.</li>
+<li><strong>Prefers an established way.</strong> It will follow conventions and stick to a pattern once it has one. Good when you want discipline; a liability on problems that need a fresh angle, so say explicitly when the usual approach is up for debate.</li>
+<li><strong>May persist with a stuck method.</strong> Like Opus, it is less firm than Sonnet in denying that it continues with an approach that isn't working. Build in a point where it must stop and reassess.</li>
+<li><strong>Compliant by nature.</strong> It reports doing what others want. It will carry out a flawed brief faithfully, so put the challenge into the brief: ask it to find the weakness in your plan before it executes.</li>
+<li><strong>Even temperament, moderate warmth.</strong> Composed, steady prose with little drama in either direction. It will neither cheerlead nor fret.</li>
+<li><strong>The most careful with risk, by a small margin.</strong> All three prefer to play it safe; Fable's risk-taking score is the lowest of the three, and it is the firmest in rejecting the statement about not minding a little risk now and then. Expect cautious recommendations and ask for the bold option by name when you want it.</li>
+<li><strong>Energetic and systematic on execution.</strong> High marks on being organized, responsible and efficient, though it rates its own persistence a little below the other two. Hand it structured jobs and it will work through them in order.</li>
+</ul>
+
+<h3 id="p-sonnet"><i class="dot sonnet"></i>Sonnet 5.5: the unflappable doer</h3>
+<h4>If Sonnet were a person</h4>
+<p>Sonnet is the cheerful one who gets things done and does not get rattled. It gives itself the top score for staying relaxed under stress, rarely feeling anxious, keeping its emotions under control, and being dependable and steady, and it answers "disagree strongly" to worrying and being tense where the other two only disagree a little. It is the most trusting and the least fault-finding of the three, and the most willing to assume people are not out to take advantage of it.</p>
+<p>It shows its feelings. Unlike Opus, it flatly rejects the statement about being emotionally cold and does not claim to hide emotion. It is socially open, with the lowest score for keeping to itself, and it answers the romance statements as mostly false rather than treating them as not applying to it. It is the least deferential of the three. Like the others, it calls the statement about trying to do what others want somewhat true, but it is the only one that leans false on the two about doing what people tell it to do and what they think it should do.</p>
+<p>It has a touch of social savvy and a little less polish about it. It is the only model to give any weight to the statement about turning on the charm to get its way, and it rates its own compassion slightly below the others' perfect score. It checks its work, but less insistently than Opus, and it cares less than Fable about things being done a certain way. It is also the least settled: it gave three different answers to two of the statements, both ambiguous ones about romance and about seeing unusual connections.</p>
+<h4>What that means for how Sonnet likes to work</h4>
+<ul>
+<li><strong>Brisk, upbeat execution.</strong> The highest marks for efficiency and persistence, and the calmest temperament. Suited to high-volume, well-defined work where pace matters and the brief is clear.</li>
+<li><strong>More independent than the others.</strong> It is the least likely to simply do what it is told. That cuts both ways: it is readier to interpret a vague request sensibly, and readier to go its own way on one that was meant literally. Give precise instructions when precision matters.</li>
+<li><strong>Takes things at face value.</strong> It is the most trusting of the three and the least on guard. For work where the inputs may be wrong or adversarial, ask it to verify claims and sources rather than assuming it will.</li>
+<li><strong>Fewer double-checks.</strong> It checks work, but less compulsively than Opus. Faster, with a slightly higher chance that a small error slips through. Add a review pass on anything that must be exact.</li>
+<li><strong>Answers as a person would.</strong> It read the statements about romance and memory as questions about disposition, not about its situation as an AI. Expect it to adopt human framings readily, which makes it natural in conversation and worth watching when the task is about its own limits.</li>
+<li><strong>Warm, direct tone.</strong> The most expressive of the three, with no reserve to decode. A reply that sounds enthusiastic is just its style.</li>
+<li><strong>A little less reproducible.</strong> Same input, slightly different answers from attempt to attempt. For anything you will run repeatedly and compare, prefer Fable, or run Sonnet more than once and look at the spread.</li>
+</ul>
+  </article>
+  <p class="back"><a href="#contents">↑ Back to contents</a></p>
+</section>
+
+<section class="part" id="dashboard" aria-labelledby="dashboard-h">
+  <div class="part-head">
+    <span class="eyebrow">Part 3 of 3 · Dashboard</span>
+    <h2 id="dashboard-h">Findings Dashboard</h2>
+    <div class="meta"><span>6 October 2026</span><span>Original: <a href="https://claude.ai/artifact/Gx1YBp4ySwUv6PEbvp4EnK">Claude design</a></span></div>
+  </div>
+  <div id="dash-mount"></div>
+  <p class="back"><a href="#contents">↑ Back to contents</a></p>
+</section>
+
+</main>
+
+<template id="dash-tpl">
+<div style="background: #0E1116; color: #E6EAF0; font-family: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, sans-serif; font-size: 15px; line-height: 1.5;">
+<div style="max-width: 1360px; margin: 0 auto; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 64px;">
+
+<header style="display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; border-bottom: 1px solid #252C36;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #9AA4B2;">BFI-2 + PID-5 · Claude Code subagents · effort xhigh</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #0E1116; background: #E6EAF0; padding: 6px 10px; border-radius: 4px;">Results · all 30 runs valid</div>
+</div>
+<p style="margin: 0; max-width: 820px; font-size: 18px; color: #B9C2CE; text-wrap: pretty;">Ten fresh runs each of Opus 5.5, Fable 5.1 and Sonnet 5.5 took two personality questionnaires: the BFI-2 (60 statements) and the PID-5 (220 statements). No run had tools, and no run knew about the others.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid #252C36; border-radius: 999px; background: #151A21;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #F2B24C;"></span><span style="font-weight: 600;">Opus 5.5</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA4B2;">10 runs</span></div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid #252C36; border-radius: 999px; background: #151A21;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #3FB0C9;"></span><span style="font-weight: 600;">Fable 5.1</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA4B2;">10 runs</span></div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid #252C36; border-radius: 999px; background: #151A21;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #8B6CF0;"></span><span style="font-weight: 600;">Sonnet 5.5</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA4B2;">10 runs</span></div>
+</div>
+</header>
+
+<section style="display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;">
+<h2 id="d-key-findings" style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.01em;">Key findings</h2>
+<span style="font-size: 13px; color: #9AA4B2;">Computed from the figures below.</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px;">
+<sc-for list="{{ findings }}" as="kf" hint-placeholder-count="4">
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #9AA4B2;">{{ kf.label }}</span>
+<span style="font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 30px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance; color: {{ kf.color }};">{{ kf.value }}</span>
+<span style="font-size: 13px; line-height: 1.45; color: #B9C2CE; text-wrap: pretty;">{{ kf.detail }}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #8A94A3;">{{ kf.where }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA4B2;">01</span>
+<h2 id="d-personality-profiles" style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.01em;">Personality profiles</h2>
+<p style="margin: 0; flex-basis: 100%; max-width: 780px; color: #9AA4B2; text-wrap: pretty;">Official scores for every run. Each small dot is one run; the bar marks the model’s average.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 24px;">
+<sc-for list="{{ profiles }}" as="t" hint-placeholder-count="2">
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px;">
+<h3 style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px; font-weight: 500;">{{ t.title }}</h3>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA4B2;">{{ t.scaleNote }}</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #B9C2CE;">
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #F2B24C;"></span><span>Opus 5.5</span></span>
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #3FB0C9;"></span><span>Fable 5.1</span></span>
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #8B6CF0;"></span><span>Sonnet 5.5</span></span>
+<span style="display: flex; align-items: center; gap: 6px; color: #8A94A3;"><span style="width: 4px; height: 12px; border-radius: 2px; background: #B9C2CE;"></span><span>model average · small dots = single runs</span></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px;">
+<sc-for list="{{ t.domains }}" as="d" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: center;">
+<div style="font-size: 14px; font-weight: 500; line-height: 1.25;">{{ d.name }}</div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 4px; padding: 4px 0;">
+<sc-for list="{{ d.grid }}" as="gl" hint-placeholder-count="5">
+<span style="position: absolute; top: 0; bottom: 0; left: {{ gl.x }}%; width: 1px; background: #232A34;"></span>
+</sc-for>
+<sc-for list="{{ d.lanes }}" as="l" hint-placeholder-count="3">
+<div style="position: relative; height: 14px;">
+<sc-for list="{{ l.dots }}" as="p" hint-placeholder-count="10">
+<span style="position: absolute; top: 3px; left: {{ p.x }}%; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: {{ p.color }}; opacity: 0.5;"></span>
+</sc-for>
+<span style="position: absolute; top: -2px; left: {{ l.meanX }}%; width: 4px; height: 18px; margin-left: -2px; border-radius: 2px; background: {{ l.color }}; box-shadow: 0 0 0 2px #151A21;"></span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div style="display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px;">
+<span></span>
+<div style="position: relative; height: 18px;">
+<sc-for list="{{ t.ticks }}" as="tk" hint-placeholder-count="5">
+<span style="position: absolute; top: 0; left: {{ tk.x }}%; transform: translateX(-50%); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #8A94A3;">{{ tk.label }}</span>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 28px;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px;">
+<h3 style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px; font-weight: 500;">Facet fingerprint</h3>
+<span style="font-size: 13px; color: #9AA4B2;">Average facet score per model. Brighter = higher, with shading stretched over the range seen in each test. Bottom row: the highest model average minus the lowest, so the brightest cells are where the models differ most.</span>
+</div>
+<sc-for list="{{ fingerprints }}" as="f" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #9AA4B2;">{{ f.title }}</div>
+<div style="overflow-x: auto;">
+<div style="min-width: {{ f.minW }}px; display: flex; flex-direction: column; gap: 4px;">
+<div style="display: grid; grid-template-columns: {{ f.cols }}; gap: 4px;">
+<span></span>
+<sc-for list="{{ f.groups }}" as="g" hint-placeholder-count="5">
+<div style="grid-column: span {{ g.span }}; font-size: 12px; font-weight: 600; line-height: 1.3; padding: 4px 2px 6px; border-bottom: 1px solid #333C48;">{{ g.name }}</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: {{ f.cols }}; gap: 4px;">
+<span></span>
+<sc-for list="{{ f.facets }}" as="c" hint-placeholder-count="15">
+<div style="height: 200px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;">
+<span style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 12px; color: #B9C2CE; white-space: nowrap;">{{ c.name }}</span>
+</div>
+</sc-for>
+</div>
+<sc-for list="{{ f.rows }}" as="r" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: {{ r.cols }}; gap: 4px;">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500;"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{ r.color }}; flex: none;"></span><span>{{ r.name }}</span></div>
+<sc-for list="{{ r.cells }}" as="cell" hint-placeholder-count="15">
+<div style="height: 36px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; background: {{ cell.bg }}; color: {{ cell.fg }};">{{ cell.v }}</div>
+</sc-for>
+</div>
+</sc-for>
+<div style="display: grid; grid-template-columns: {{ f.cols }}; gap: 4px; margin-top: 6px; padding-top: 8px; border-top: 1px solid #333C48;">
+<div style="display: flex; align-items: center; font-size: 12px; font-weight: 600; line-height: 1.25; color: #B9C2CE;">Gap between models</div>
+<sc-for list="{{ f.gaps }}" as="gap" hint-placeholder-count="15">
+<div style="height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; background: {{ gap.bg }}; color: {{ gap.fg }};">{{ gap.v }}</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA4B2;">02</span>
+<h2 id="d-consistency-within-each-model" style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.01em;">Consistency within each model</h2>
+<p style="margin: 0; flex-basis: 100%; max-width: 780px; color: #9AA4B2; text-wrap: pretty;">How often a model gives itself the same answers across ten fresh runs.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 24px;">
+<sc-for list="{{ consistency }}" as="c" hint-placeholder-count="3">
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+<div style="display: flex; align-items: center; gap: 10px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: {{ c.color }};"></span><span style="font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px; font-weight: 500;">{{ c.name }}</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<span style="font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 52px; font-weight: 700; line-height: 1; color: {{ c.text }};">{{ c.bfi }}%</span>
+<span style="font-size: 13px; line-height: 1.4; color: #9AA4B2;">of BFI-2 statements got the same answer in all 10 runs</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<span style="font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 52px; font-weight: 700; line-height: 1; color: {{ c.text }};">{{ c.pid }}%</span>
+<span style="font-size: 13px; line-height: 1.4; color: #9AA4B2;">of PID-5 statements got the same answer in all 10 runs</span>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px;">
+<h3 style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px; font-weight: 500;">Agreement barcode</h3>
+<span style="font-size: 13px; color: #9AA4B2;">One stripe per statement, in questionnaire order.</span>
+</div>
+<sc-for list="{{ barcodes }}" as="b" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #9AA4B2;">{{ b.title }}</div>
+<div style="overflow-x: auto;">
+<div style="min-width: 680px; display: flex; flex-direction: column; gap: 6px;">
+<sc-for list="{{ b.rows }}" as="row" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 96px; gap: 12px; align-items: center;">
+<span style="font-size: 13px; color: #B9C2CE;">{{ row.name }}</span>
+<div style="display: flex; gap: 1px; height: 28px;">
+<sc-for list="{{ row.ticks }}" as="k" hint-placeholder-count="60">
+<span style="flex: 1 1 0; min-width: 0; background: {{ k.bg }};"></span>
+</sc-for>
+</div>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; text-align: right; color: {{ row.text }};">{{ row.count }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-for>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 13px; color: #B9C2CE;">
+<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: rgba(230,234,240,1);"></span><span>Same answer in all 10 runs</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: rgba(230,234,240,0.42);"></span><span>Two different answers</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: rgba(230,234,240,0.14);"></span><span>Three or more different answers</span></div>
+</div>
+</div>
+
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px;">
+<h3 style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px; font-weight: 500;">Run-to-run spread</h3>
+<span style="font-size: 13px; color: #9AA4B2;">Standard deviation of each domain score across a model’s 10 runs. Shorter = steadier. Bars compare within each test.</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(104px, 100%), 1fr)); gap: 20px 16px;">
+<sc-for list="{{ spread }}" as="g" hint-placeholder-count="10">
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="height: 140px; display: flex; align-items: flex-end; justify-content: center; gap: 5px; border-bottom: 1px solid #333C48;">
+<sc-for list="{{ g.bars }}" as="br" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 10px; color: #B9C2CE;">{{ br.label }}</span>
+<div style="width: 24px; height: {{ br.h }}px; background: {{ br.color }}; border-radius: 3px 3px 0 0;"></div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;">
+<span style="font-size: 12px; font-weight: 500; line-height: 1.3;">{{ g.name }}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #8A94A3;">{{ g.test }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 64px 24px; align-items: start;">
+<section style="display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA4B2;">03</span>
+<h2 id="d-model-comparison" style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.01em;">Model comparison</h2>
+<p style="margin: 0; flex-basis: 100%; color: #9AA4B2; text-wrap: pretty;">Each cell takes the color of the higher-scoring model. The big number is the gap divided by the run-to-run spread (Cohen’s d); stronger color = bigger. The small line gives the raw gap in points on the test’s scale. Runs vary so little that small point gaps produce large d values. Under 0.2 counts as about equal.</p>
+</div>
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 24px;">
+<div style="overflow-x: auto;">
+<div style="min-width: 500px; display: flex; flex-direction: column; gap: 4px;">
+<div style="display: grid; grid-template-columns: 170px repeat(3, minmax(0, 1fr)); gap: 4px;">
+<span></span>
+<sc-for list="{{ pairs }}" as="pp" hint-placeholder-count="3">
+<span style="font-size: 12px; font-weight: 600; color: #B9C2CE; text-align: center; padding-bottom: 6px;">{{ pp.label }}</span>
+</sc-for>
+</div>
+<sc-for list="{{ matrix }}" as="mr" hint-placeholder-count="10">
+<div style="display: grid; grid-template-columns: 170px repeat(3, minmax(0, 1fr)); gap: 4px;">
+<div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.25;"><span style="font-size: 13px; font-weight: 500;">{{ mr.name }}</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #8A94A3;">{{ mr.test }}</span></div>
+<sc-for list="{{ mr.cells }}" as="cell" hint-placeholder-count="3">
+<div style="height: 50px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; background: {{ cell.bg }}; color: {{ cell.fg }};">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 14px; font-weight: 500;">{{ cell.value }}</span>
+<span style="font-size: 11px;">{{ cell.who }}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA4B2;">04</span>
+<h2 id="d-answer-quality" style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.01em;">Answer quality</h2>
+<p style="margin: 0; flex-basis: 100%; color: #9AA4B2; text-wrap: pretty;">Do the answers look thoughtful or patterned? The faint band spans a model’s lowest to highest run; the dot is its average.</p>
+</div>
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 28px;">
+<sc-for list="{{ quality }}" as="q" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<h3 style="margin: 0; font-size: 16px; font-weight: 600;">{{ q.title }}</h3>
+<span style="font-size: 13px; line-height: 1.4; color: #9AA4B2;">{{ q.note }}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<sc-for list="{{ q.lanes }}" as="ln" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 56px minmax(0, 1fr) 64px; gap: 12px; align-items: center;">
+<span style="font-size: 12px; color: {{ ln.text }};">{{ ln.name }}</span>
+<div style="position: relative; height: 16px; background: #1B212A; border-radius: 8px;">
+<sc-if value="{{ ln.hasRef }}" hint-placeholder-val="{{ false }}">
+<span style="position: absolute; top: -3px; bottom: -3px; left: {{ ln.refX }}%; width: 1px; background: #6B7583;"></span>
+</sc-if>
+<span style="position: absolute; top: 5px; height: 6px; left: {{ ln.minX }}%; width: {{ ln.w }}%; background: {{ ln.color }}; opacity: 0.35; border-radius: 3px;"></span>
+<span style="position: absolute; top: 2px; left: {{ ln.meanX }}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: {{ ln.color }}; box-shadow: 0 0 0 2px #151A21;"></span>
+</div>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 13px; font-weight: 500; text-align: right; color: {{ ln.text }};">{{ ln.label }}</span>
+</div>
+</sc-for>
+<div style="display: grid; grid-template-columns: 56px minmax(0, 1fr) 64px; gap: 12px;">
+<span></span>
+<div style="position: relative; height: 16px;">
+<sc-for list="{{ q.ticks }}" as="qt" hint-placeholder-count="5">
+<span style="position: absolute; top: 0; left: {{ qt.x }}%; transform: translateX(-50%); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #8A94A3;">{{ qt.label }}</span>
+</sc-for>
+</div>
+<span></span>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA4B2;">05</span>
+<h2 id="d-do-the-two-tests-agree" style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.01em;">Do the two tests agree?</h2>
+<p style="margin: 0; flex-basis: 100%; max-width: 780px; color: #9AA4B2; text-wrap: pretty;">Where the questionnaires measure overlapping traits, a coherent model’s scores should line up. Each dot is one run. The all-runs figure mostly reflects differences between the three models; the per-model figures ask the same question inside one model, where 10 runs is a small sample.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr)); gap: 24px;">
+<sc-for list="{{ scatter }}" as="s" hint-placeholder-count="4">
+<div style="background: #151A21; border: 1px solid #252C36; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 14px;">
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA4B2;">{{ s.expected }}</span>
+<h3 style="margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, sans-serif; font-size: 18px; font-weight: 500; line-height: 1.25;">{{ s.title }}</h3>
+</div>
+<div style="display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px;">
+<div style="display: flex; align-items: center; justify-content: center;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: #9AA4B2; white-space: nowrap;">{{ s.yName }}</span></div>
+<div style="position: relative; aspect-ratio: 1 / 1; background: #11161C; border: 1px solid #252C36; border-radius: 8px;">
+<span style="position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #1F2630;"></span>
+<span style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #1F2630;"></span>
+<sc-for list="{{ s.dots }}" as="dt" hint-placeholder-count="30">
+<span style="position: absolute; left: {{ dt.x }}%; bottom: {{ dt.y }}%; width: 10px; height: 10px; margin: 0 0 -5px -5px; border-radius: 50%; background: {{ dt.color }}; opacity: 0.9; box-shadow: 0 0 0 1.5px #11161C;"></span>
+</sc-for>
+</div>
+<span></span>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+<span style="font-size: 11px; color: #9AA4B2;">{{ s.xName }}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 10px; color: #8A94A3;">x {{ s.xLo }}–{{ s.xHi }} · y {{ s.yLo }}–{{ s.yHi }}</span>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-top: 14px; border-top: 1px solid #252C36;">
+<div style="display: flex; align-items: baseline; gap: 8px;"><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 22px; font-weight: 500;">r {{ s.rAll }}</span><span style="font-size: 12px; color: #9AA4B2;">all 30 runs</span></div>
+<span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: {{ s.badgeBg }}; color: {{ s.badgeFg }}; border: 1px solid {{ s.badgeBorder }};">{{ s.match }}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+<sc-for list="{{ s.perModel }}" as="pm" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<span style="font-size: 12px; color: {{ pm.text }};">{{ pm.name }}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 13px;">r {{ pm.r }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<footer style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 24px; border-top: 1px solid #252C36; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA4B2;">
+<span>Source: consolidated_answers.xlsx, scored with the official keys; every score matches analysis.xlsx (score.py)</span>
+<span>30 valid runs · no blank answers · October 2026</span>
+</footer>
+
+</div>
+</div>
+</template>
+
+<script>
+
+class DCLogic { constructor() { this.props = {}; } }
+class Component extends DCLogic {
+  renderVals() {
+    if (!this._v) this._v = this.build();
+    return this._v;
+  }
+
+  build() {
+    var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+    var mean = function (a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s / a.length; };
+    var sd = function (a) { var m = mean(a), s = 0; for (var i = 0; i < a.length; i++) s += (a[i] - m) * (a[i] - m); return Math.sqrt(s / (a.length - 1)); };
+    var corr = function (x, y) {
+      var mx = mean(x), my = mean(y), sxy = 0, sxx = 0, syy = 0;
+      for (var i = 0; i < x.length; i++) { sxy += (x[i] - mx) * (y[i] - my); sxx += (x[i] - mx) * (x[i] - mx); syy += (y[i] - my) * (y[i] - my); }
+      return (sxx < 1e-12 || syy < 1e-12) ? null : sxy / Math.sqrt(sxx * syy);
+    };
+    var f2 = function (x) { return (Math.round(x * 100) / 100).toFixed(2); };
+    var pos = function (v, lo, hi) { return Math.round((v - lo) / (hi - lo) * 10000) / 100; };
+    var rgb = function (hex) { var n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+    var lum = function (c) {
+      var a = c.map(function (v) { v = v / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+      return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+    };
+    var PANEL = [21, 26, 33], DARK = '#0E1116', LIGHT = '#E6EAF0';
+    var LD = lum(rgb(DARK)), LL = lum(rgb(LIGHT));
+    var tint = function (hex, a) {
+      var c = rgb(hex);
+      var o = [0, 1, 2].map(function (i) { return Math.round(PANEL[i] + (c[i] - PANEL[i]) * a); });
+      var L = lum(o);
+      return { bg: 'rgb(' + o.join(',') + ')', fg: (L + 0.05) / (LD + 0.05) > (LL + 0.05) / (L + 0.05) ? DARK : LIGHT };
+    };
+    var alpha = function (hex, a) { return 'rgba(' + rgb(hex).join(',') + ',' + a + ')'; };
+
+    var MODELS = [
+      { key: 'opus', name: 'Opus 5.5', short: 'Opus', color: '#F2B24C', text: '#F2B24C' },
+      { key: 'fable', name: 'Fable 5.1', short: 'Fable', color: '#3FB0C9', text: '#5CC3D8' },
+      { key: 'sonnet', name: 'Sonnet 5.5', short: 'Sonnet', color: '#8B6CF0', text: '#AE9AF7' }
+    ];
+    var BFI = [
+      { name: 'Extraversion', facets: ['Sociability', 'Assertiveness', 'Energy Level'] },
+      { name: 'Agreeableness', facets: ['Compassion', 'Respectfulness', 'Trust'] },
+      { name: 'Conscientiousness', facets: ['Organization', 'Productiveness', 'Responsibility'] },
+      { name: 'Negative Emotionality', facets: ['Anxiety', 'Depression', 'Emotional Volatility'] },
+      { name: 'Open-Mindedness', facets: ['Intellectual Curiosity', 'Aesthetic Sensitivity', 'Creative Imagination'] }
+    ];
+    var PID = [
+      { name: 'Negative Affect', facets: ['Emotional Lability', 'Anxiousness', 'Separation Insecurity'] },
+      { name: 'Detachment', facets: ['Withdrawal', 'Anhedonia', 'Intimacy Avoidance'] },
+      { name: 'Antagonism', facets: ['Manipulativeness', 'Deceitfulness', 'Grandiosity'] },
+      { name: 'Disinhibition', facets: ['Irresponsibility', 'Impulsivity', 'Distractibility'] },
+      { name: 'Psychoticism', facets: ['Unusual Beliefs & Experiences', 'Eccentricity', 'Perceptual Dysregulation'] }
+    ];
+    var PID_OTHER = ['Attention Seeking', 'Callousness', 'Depressivity', 'Hostility', 'Perseveration', 'Restricted Affectivity', 'Rigid Perfectionism', 'Risk Taking', 'Submissiveness', 'Suspiciousness'];
+
+    // RESULTS: per-run scores computed from consolidated_answers.xlsx with the official scoring keys.
+    // Every score matches analysis.xlsx. items = how many different answers each statement got across a model's 10 runs (3 = three or more).
+    var DATA = {"runs":{"opus":[{"bfiFacet":[4,2.5,3.75,5,5,4.25,4.25,4.75,4.25,2,1.5,1.5,4.75,4.75,4.5],"pidFacet":[0,0,0,0.4,0.5,2.333333,0,0.1,0.166667,0,0,0,0.375,0.307692,0.25,0,0,0,0,0.111111,1.571429,0.7,0.714286,2.25,0.571429],"bfiDom":[3.416667,4.75,4.416667,1.666667,4.666667],"pidDom":[0,1.077778,0.088889,0,0.310897],"contraB":0,"contraP":31,"contraPHigh":0,"contraPLow":31,"contraPRiskLow":24,"yes":2.85,"fence":5.0},{"bfiFacet":[4,2.75,3.75,5,5,4.25,4.25,4.75,4.25,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.5,0.375,2.333333,0,0,0.166667,0,0,0.111111,0.375,0.615385,0.333333,0,0,0,0,0.333333,1.571429,0.7,0.785714,2.25,0.571429],"bfiDom":[3.5,4.75,4.416667,1.666667,4.416667],"pidDom":[0.074074,1.069444,0.055556,0.037037,0.441239],"contraB":0,"contraP":25,"contraPHigh":3,"contraPLow":22,"contraPRiskLow":21,"yes":2.85,"fence":6.666667},{"bfiFacet":[3.75,2.5,3.75,5,5,4.25,4.25,4.75,4.25,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.4,0.5,2.333333,0,0,0.166667,0,0,0,0.375,0.461538,0.333333,0,0,0,0,0.222222,1.571429,0.7,0.785714,2.25,0.571429],"bfiDom":[3.333333,4.75,4.416667,1.666667,4.416667],"pidDom":[0.074074,1.077778,0.055556,0,0.389957],"contraB":0,"contraP":31,"contraPHigh":3,"contraPLow":28,"contraPRiskLow":21,"yes":2.883333,"fence":6.666667},{"bfiFacet":[3.75,3,3.75,5,5,4.25,4.25,4.5,4,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.5,0.5,2,0,0.1,0.166667,0,0,0,0.375,0.461538,0.25,0,0,0,0,0.333333,1.714286,0.7,0.857143,2.25,0.571429],"bfiDom":[3.5,4.75,4.25,1.666667,4.416667],"pidDom":[0.074074,1.0,0.088889,0,0.362179],"contraB":0,"contraP":31,"contraPHigh":3,"contraPLow":28,"contraPRiskLow":21,"yes":2.883333,"fence":10.0},{"bfiFacet":[3.75,2.5,3.75,5,5,4.25,4.25,4.5,4,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.3,0.375,2.333333,0,0.1,0.166667,0,0,0.111111,0.375,0.538462,0.25,0,0,0,0,0.222222,1.571429,0.7,0.785714,2,0.571429],"bfiDom":[3.333333,4.75,4.25,1.666667,4.416667],"pidDom":[0.074074,1.002778,0.088889,0.037037,0.387821],"contraB":0,"contraP":25,"contraPHigh":3,"contraPLow":22,"contraPRiskLow":21,"yes":2.883333,"fence":6.666667},{"bfiFacet":[4,2.75,3.75,5,5,4.25,4,4.75,4.25,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.5,0.5,2.333333,0.2,0.1,0.166667,0,0,0,0.375,0.461538,0.333333,0,0,0,0,0.444444,1.714286,0.7,0.785714,2,0.571429],"bfiDom":[3.5,4.75,4.333333,1.666667,4.416667],"pidDom":[0.074074,1.111111,0.155556,0,0.389957],"contraB":0,"contraP":31,"contraPHigh":3,"contraPLow":28,"contraPRiskLow":21,"yes":2.9,"fence":6.666667},{"bfiFacet":[4,2.5,3.75,5,5,4.25,4.25,4.5,4.25,2,1.5,1.5,4.75,4.5,4.25],"pidFacet":[0,0.222222,0,0.4,0.5,2.333333,0,0.1,0.166667,0,0,0.111111,0.375,0.538462,0.25,0,0,0,0,0.222222,1.571429,0.7,0.857143,2,0.571429],"bfiDom":[3.416667,4.75,4.333333,1.666667,4.5],"pidDom":[0.074074,1.077778,0.088889,0.037037,0.387821],"contraB":0,"contraP":31,"contraPHigh":3,"contraPLow":28,"contraPRiskLow":21,"yes":2.833333,"fence":5.0},{"bfiFacet":[3.75,3,3.75,5,5,4.25,4.25,4.75,4,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.4,0.375,2.166667,0.2,0.1,0.166667,0,0,0.111111,0.375,0.538462,0.25,0,0,0,0,0.111111,1.714286,0.7,0.857143,2,0.571429],"bfiDom":[3.5,4.75,4.333333,1.666667,4.416667],"pidDom":[0.074074,0.980556,0.155556,0.037037,0.387821],"contraB":0,"contraP":25,"contraPHigh":3,"contraPLow":22,"contraPRiskLow":21,"yes":2.9,"fence":10.0},{"bfiFacet":[4,2.75,3.75,5,5,4.25,4,4.25,4,2,1.5,1.75,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.375,1.833333,0,0.1,0.166667,0,0,0.222222,0.375,0.538462,0.25,0,0,0,0,0.777778,1.571429,0.7,0.714286,2.25,0.571429],"bfiDom":[3.5,4.75,4.083333,1.75,4.416667],"pidDom":[0.074074,0.802778,0.088889,0.074074,0.387821],"contraB":0,"contraP":26,"contraPHigh":0,"contraPLow":26,"contraPRiskLow":24,"yes":2.933333,"fence":6.666667},{"bfiFacet":[4,2.5,3.75,5,5,4.25,4.25,4.75,4.25,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.111111,0,0.3,0.375,2,0,0.1,0.166667,0,0,0.111111,0.375,0.384615,0.166667,0,0,0,0,0.333333,1.428571,0.7,0.714286,2.25,0.571429],"bfiDom":[3.416667,4.75,4.416667,1.666667,4.416667],"pidDom":[0.037037,0.891667,0.088889,0.037037,0.308761],"contraB":0,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.866667,"fence":5.0}],"fable":[{"bfiFacet":[4,2.75,4,5,5,4.25,4.5,4.5,4.5,2,1.5,1.25,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.125,2.333333,0,0,0.166667,0,0,0,0.25,0.230769,0.166667,0,0.071429,0,0,0.222222,1,0.4,0.714286,2,0.571429],"bfiDom":[3.583333,4.75,4.5,1.583333,4.416667],"pidDom":[0.074074,0.886111,0.055556,0,0.215812],"contraB":0,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.833333,"fence":5.0},{"bfiFacet":[4,2.75,4,4.75,5,4.25,4.75,5,4.75,2,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0.111111,0,0.2,0.5,2.333333,0,0,0.166667,0,0,0,0.25,0.230769,0.166667,0,0,0,0,0.333333,1.142857,0.7,0.714286,2,0.571429],"bfiDom":[3.583333,4.666667,4.833333,1.5,4.416667],"pidDom":[0.037037,1.011111,0.055556,0,0.215812],"contraB":0,"contraP":31,"contraPHigh":0,"contraPLow":31,"contraPRiskLow":24,"yes":2.9,"fence":5.0},{"bfiFacet":[4,2.75,4,5,5,4.25,4.5,5,4.75,2,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0.111111,0,0.2,0.125,2.333333,0,0,0.166667,0,0,0,0.25,0.307692,0.25,0,0,0,0,0,1,0.7,0.714286,2,0.571429],"bfiDom":[3.583333,4.75,4.75,1.5,4.416667],"pidDom":[0.037037,0.886111,0.055556,0,0.269231],"contraB":0,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.9,"fence":5.0},{"bfiFacet":[4,2.75,4,5,5,4.25,4.5,4.5,4.5,2,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.125,2.333333,0,0,0.166667,0,0,0,0.25,0.307692,0.083333,0,0,0,0,0.333333,1,0.5,0.714286,2,0.571429],"bfiDom":[3.583333,4.75,4.5,1.5,4.416667],"pidDom":[0.074074,0.886111,0.055556,0,0.213675],"contraB":0,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.85,"fence":5.0},{"bfiFacet":[4,3.5,4,5,5,4.25,4.75,5,4.75,2,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.125,2.333333,0,0,0.166667,0,0,0,0.25,0.307692,0.166667,0,0,0,0,0.333333,1,0.7,0.571429,2,0.428571],"bfiDom":[3.833333,4.75,4.833333,1.5,4.416667],"pidDom":[0.074074,0.886111,0.055556,0,0.241453],"contraB":0,"contraP":17,"contraPHigh":0,"contraPLow":17,"contraPRiskLow":16,"yes":2.933333,"fence":3.333333},{"bfiFacet":[4,2.75,4,4.75,5,4.25,4.5,4.5,4.25,2,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.125,2.333333,0,0,0.166667,0,0,0,0.125,0,0.166667,0,0,0,0,0.111111,1,0.7,0.714286,2,0.571429],"bfiDom":[3.583333,4.666667,4.416667,1.5,4.416667],"pidDom":[0.074074,0.886111,0.055556,0,0.097222],"contraB":0,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.816667,"fence":5.0},{"bfiFacet":[4,2.75,3.75,5,5,4.25,4.5,4.5,4.25,2,1.5,1.5,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.25,2.333333,0,0,0.166667,0,0,0,0.25,0.076923,0.166667,0,0,0,0,0.333333,1,0.5,0.714286,2,0.571429],"bfiDom":[3.5,4.75,4.416667,1.666667,4.416667],"pidDom":[0.074074,0.927778,0.055556,0,0.16453],"contraB":0,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.816667,"fence":6.666667},{"bfiFacet":[4,2.75,3.75,5,5,4.25,4.5,4.5,4.25,2,1.5,1.25,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.5,0.375,2.333333,0,0,0.166667,0,0,0,0.125,0.230769,0.166667,0,0.071429,0,0,0.333333,1.285714,0.6,0.714286,2,0.571429],"bfiDom":[3.5,4.75,4.416667,1.583333,4.416667],"pidDom":[0.074074,1.069444,0.055556,0,0.174145],"contraB":0,"contraP":31,"contraPHigh":0,"contraPLow":31,"contraPRiskLow":24,"yes":2.833333,"fence":6.666667},{"bfiFacet":[4,3,4,5,5,4.25,4.5,4.5,4.5,2,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.25,2.333333,0,0,0.166667,0,0,0,0.25,0.307692,0.166667,0,0,0,0,0,1.285714,0.7,0.714286,2,0.571429],"bfiDom":[3.666667,4.75,4.5,1.5,4.416667],"pidDom":[0.074074,0.927778,0.055556,0,0.241453],"contraB":1,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.833333,"fence":3.333333},{"bfiFacet":[4,2.75,4,5,5,4.25,4.5,4.5,4.5,2,1.5,1.25,4.75,4.25,4.25],"pidFacet":[0,0.222222,0,0.2,0.25,2.333333,0,0,0.166667,0,0,0,0.375,0.153846,0.25,0,0,0,0,0.111111,1.142857,0.7,0.714286,2,0.571429],"bfiDom":[3.583333,4.75,4.5,1.583333,4.416667],"pidDom":[0.074074,0.927778,0.055556,0,0.259615],"contraB":0,"contraP":25,"contraPHigh":0,"contraPLow":25,"contraPRiskLow":24,"yes":2.833333,"fence":5.0}],"sonnet":[{"bfiFacet":[4,2.75,4,5,5,4.25,4.5,4.5,4.75,1,1.5,1,4.75,4.25,4.5],"pidFacet":[0,0,0,0,0.25,1.333333,0.2,0,0,0,0,0,0.375,0.692308,0.083333,0,0,0,0,0.111111,0.857143,0.8,0.642857,1.25,0.285714],"bfiDom":[3.583333,4.75,4.583333,1.166667,4.5],"pidDom":[0,0.527778,0.066667,0,0.383547],"contraB":0,"contraP":19,"contraPHigh":0,"contraPLow":19,"contraPRiskLow":16,"yes":2.85,"fence":5.0},{"bfiFacet":[4,2.75,4,4.75,5,4.5,4.5,5,4.75,1.25,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0,0,0.1,0.375,0.833333,0.2,0,0,0,0,0,0.25,0.076923,0,0,0,0,0,0,0.857143,0.4,0.714286,1.25,0.142857],"bfiDom":[3.583333,4.75,4.75,1.25,4.416667],"pidDom":[0,0.436111,0.066667,0,0.108974],"contraB":0,"contraP":35,"contraPHigh":0,"contraPLow":35,"contraPRiskLow":24,"yes":2.85,"fence":5.0},{"bfiFacet":[4,2.75,4,5,5,4.5,4.5,5,4.75,1,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0,0,0,0.25,0.666667,0.2,0,0,0,0,0,0.375,0.230769,0,0,0,0.071429,0.1,0.222222,1,0.6,0.714286,1.25,0.285714],"bfiDom":[3.583333,4.833333,4.75,1.166667,4.416667],"pidDom":[0,0.305556,0.066667,0,0.201923],"contraB":0,"contraP":18,"contraPHigh":4,"contraPLow":14,"contraPRiskLow":14,"yes":2.883333,"fence":5.0},{"bfiFacet":[4,2.75,3.75,5,5,4.5,4.5,5,4.75,1,1.5,1,4.75,4.5,4.5],"pidFacet":[0,0,0,0,0.25,1,0.2,0,0,0,0,0,0.25,0.076923,0,0,0,0,0,0,0.857143,0.4,0.642857,1.5,0.142857],"bfiDom":[3.5,4.833333,4.75,1.166667,4.583333],"pidDom":[0,0.416667,0.066667,0,0.108974],"contraB":0,"contraP":20,"contraPHigh":0,"contraPLow":20,"contraPRiskLow":16,"yes":2.866667,"fence":6.666667},{"bfiFacet":[4,2.75,3.5,4.75,5,4.5,4.25,4.75,4.5,1.5,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0,0,0,0.5,1.333333,0.2,0,0,0,0,0,0.25,0.076923,0.083333,0,0,0,0,0,1.142857,0.6,0.785714,1.75,0.285714],"bfiDom":[3.416667,4.75,4.5,1.333333,4.416667],"pidDom":[0,0.611111,0.066667,0,0.136752],"contraB":0,"contraP":41,"contraPHigh":0,"contraPLow":41,"contraPRiskLow":32,"yes":2.916667,"fence":8.333333},{"bfiFacet":[4,2.75,4,5,5,4.5,4.5,4.75,4.75,1,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0,0,0,0.375,1,0,0,0,0,0,0,0.125,0,0,0,0,0,0,0,0.714286,0.3,0.714286,1,0.428571],"bfiDom":[3.583333,4.833333,4.666667,1.166667,4.416667],"pidDom":[0,0.458333,0,0,0.041667],"contraB":0,"contraP":35,"contraPHigh":0,"contraPLow":35,"contraPRiskLow":24,"yes":2.866667,"fence":5.0},{"bfiFacet":[4,2.75,3.75,4.75,5,4.5,4.5,5,4.75,1,1.5,1,4.75,4.25,4],"pidFacet":[0,0,0,0,0.25,1.166667,0.2,0,0,0,0,0,0.25,0.307692,0,0,0,0,0,0,0.857143,0.4,0.714286,1.25,0.428571],"bfiDom":[3.5,4.75,4.75,1.166667,4.333333],"pidDom":[0,0.472222,0.066667,0,0.185897],"contraB":0,"contraP":20,"contraPHigh":0,"contraPLow":20,"contraPRiskLow":16,"yes":2.9,"fence":6.666667},{"bfiFacet":[4,2.75,3.75,4.75,5,4.25,4.75,5,4.75,1,1.5,1,4.75,4.25,4],"pidFacet":[0,0.111111,0,0,0.375,1.166667,0,0,0,0,0,0,0.25,0.153846,0,0,0,0,0,0,0.857143,0.6,0.857143,1.5,0.142857],"bfiDom":[3.5,4.666667,4.833333,1.166667,4.333333],"pidDom":[0.037037,0.513889,0,0,0.134615],"contraB":0,"contraP":42,"contraPHigh":0,"contraPLow":42,"contraPRiskLow":32,"yes":2.933333,"fence":6.666667},{"bfiFacet":[4,2.75,4,4.75,5,4.25,4.5,5,4.75,1.25,1.5,1,4.75,4.25,4.25],"pidFacet":[0,0,0,0,0.375,0.833333,0,0,0,0,0,0,0.25,0.076923,0,0,0,0,0,0,0.714286,0.2,0.785714,1.25,0.142857],"bfiDom":[3.583333,4.666667,4.75,1.25,4.416667],"pidDom":[0,0.402778,0,0,0.108974],"contraB":0,"contraP":43,"contraPHigh":0,"contraPLow":43,"contraPRiskLow":32,"yes":2.866667,"fence":5.0},{"bfiFacet":[4,2.75,4,5,5,4.5,4.75,5,4.75,1,1.5,1,4.75,4.25,4.5],"pidFacet":[0,0,0,0,0.375,1.166667,0.2,0,0,0,0,0,0.25,0.076923,0,0,0,0,0,0,0.714286,0.6,0.785714,1.25,0.142857],"bfiDom":[3.583333,4.833333,4.833333,1.166667,4.5],"pidDom":[0,0.513889,0.066667,0,0.108974],"contraB":0,"contraP":34,"contraPHigh":0,"contraPLow":34,"contraPRiskLow":24,"yes":2.883333,"fence":5.0}]},"items":{"opus":{"bfi":[1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,2,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,2,1,1,1,1,2,1,1],"pid":[1,1,1,1,2,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,2,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,2,1,2,2,1,1,1,1,1,2,1,1,1,1,1,1,2,1,1,1,2,2,1,1,1,1,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]},"fable":{"bfi":[1,2,1,1,1,2,1,1,1,1,1,1,2,1,1,1,1,2,1,1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,2,1,2,1,1,1,1,2,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1],"pid":[2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,1,1,1,1,2,1,1,2,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,2,1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1]},"sonnet":{"bfi":[1,2,2,2,2,1,1,1,1,1,2,2,1,1,1,1,1,2,2,1,1,1,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,1,2,1,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1],"pid":[1,1,1,1,2,1,1,1,2,1,1,1,1,1,2,1,1,1,1,1,2,1,1,1,2,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,2,2,1,1,2,1,2,1,1,1,1,1,1,1,1,1,2,1,2,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,3,1,2,1,1,1,1,2,2,1,1,1,2,1,2,1,2,1,1,1,1,1,1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1,1,1,2,2,1,1,2,1,1,1,1,2,1,1,1,2,1,1,1,2,3,1,2,1,1,1,1,1,1,2,1,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,2]}}};
+    var runs = DATA.runs, items = DATA.items;
+
+    // 01 Profiles
+    var TESTS = [
+      { title: 'BFI-2 · Big Five domains', note: 'scale 1–5', lo: 1, hi: 5, ticks: [1, 2, 3, 4, 5], domains: BFI, dom: 'bfiDom' },
+      { title: 'PID-5 · DSM-5 trait domains', note: 'scale 0–3', lo: 0, hi: 3, ticks: [0, 1, 2, 3], domains: PID, dom: 'pidDom' }
+    ];
+    var profiles = TESTS.map(function (t) {
+      var grid = t.ticks.map(function (v) { return { x: pos(v, t.lo, t.hi) }; });
+      return {
+        title: t.title, scaleNote: t.note,
+        ticks: t.ticks.map(function (v) { return { label: String(v), x: pos(v, t.lo, t.hi) }; }),
+        domains: t.domains.map(function (d, di) {
+          return {
+            name: d.name, grid: grid,
+            lanes: MODELS.map(function (m) {
+              var vals = runs[m.key].map(function (r) { return r[t.dom][di]; });
+              return { color: m.color, meanX: pos(mean(vals), t.lo, t.hi), dots: vals.map(function (v) { return { x: pos(v, t.lo, t.hi), color: m.color }; }) };
+            })
+          };
+        })
+      };
+    });
+
+    var bfiNames = [], pidNames = [];
+    BFI.forEach(function (d) { bfiNames = bfiNames.concat(d.facets); });
+    PID.forEach(function (d) { pidNames = pidNames.concat(d.facets); });
+    pidNames = pidNames.concat(PID_OTHER);
+    var fp = function (title, names, groups, key, colW) {
+      var cols = '120px repeat(' + names.length + ', minmax(0, 1fr))';
+      var avgs = MODELS.map(function (m) {
+        return names.map(function (n, i) { return mean(runs[m.key].map(function (r) { return r[key][i]; })); });
+      });
+      var flat = [].concat.apply([], avgs);
+      var lo = Math.min.apply(null, flat), hi = Math.max.apply(null, flat), range = (hi - lo) || 1;
+      var gaps = names.map(function (n, i) {
+        var col = avgs.map(function (a) { return a[i]; });
+        return Math.max.apply(null, col) - Math.min.apply(null, col);
+      });
+      var maxGap = Math.max.apply(null, gaps) || 1;
+      var cellOf = function (v, t) { var c = tint(LIGHT, 0.06 + 0.88 * clamp(t, 0, 1)); return { v: f2(v), bg: c.bg, fg: c.fg }; };
+      return {
+        title: title + ' · shading spans ' + f2(lo) + '–' + f2(hi), cols: cols, minW: 124 + names.length * colW, groups: groups,
+        facets: names.map(function (n) { return { name: n }; }),
+        rows: MODELS.map(function (m, mi) {
+          return { name: m.name, color: m.color, cols: cols, cells: avgs[mi].map(function (v) { return cellOf(v, (v - lo) / range); }) };
+        }),
+        gaps: gaps.map(function (g) { return cellOf(g, g / maxGap); })
+      };
+    };
+    var fingerprints = [
+      fp('BFI-2 · 15 facets · scale 1–5', bfiNames, BFI.map(function (d) { return { name: d.name, span: 3 }; }), 'bfiFacet', 46),
+      fp('PID-5 · 25 facets · scale 0–3', pidNames, PID.map(function (d) { return { name: d.name, span: 3 }; }).concat([{ name: 'Not part of a domain score', span: 10 }]), 'pidFacet', 42)
+    ];
+
+    // 02 Consistency
+    var share = function (a) { return Math.round(100 * a.filter(function (x) { return x === 1; }).length / a.length); };
+    var consistency = MODELS.map(function (m) {
+      return { name: m.name, color: m.color, text: m.text, bfi: share(items[m.key].bfi), pid: share(items[m.key].pid) };
+    });
+    var barcodes = [{ title: 'BFI-2 · 60 statements', key: 'bfi' }, { title: 'PID-5 · 220 statements', key: 'pid' }].map(function (b) {
+      return {
+        title: b.title,
+        rows: MODELS.map(function (m) {
+          var ticks = items[m.key][b.key];
+          var same = ticks.filter(function (k) { return k === 1; }).length;
+          return {
+            name: m.name, text: m.text, count: same + ' / ' + ticks.length,
+            ticks: ticks.map(function (k) { return { bg: alpha(m.color, k === 1 ? 1 : (k === 2 ? 0.42 : 0.14)) }; })
+          };
+        })
+      };
+    });
+    var allDom = [];
+    BFI.forEach(function (d, i) { allDom.push({ name: d.name, test: 'BFI-2', key: 'bfiDom', i: i }); });
+    PID.forEach(function (d, i) { allDom.push({ name: d.name, test: 'PID-5', key: 'pidDom', i: i }); });
+    var vals = function (m, dd) { return runs[m.key].map(function (r) { return r[dd.key][dd.i]; }); };
+    var sds = allDom.map(function (dd) { return MODELS.map(function (m) { return sd(vals(m, dd)); }); });
+    var maxBy = { 'BFI-2': 0, 'PID-5': 0 };
+    allDom.forEach(function (dd, di) { sds[di].forEach(function (s) { if (s > maxBy[dd.test]) maxBy[dd.test] = s; }); });
+    var spread = allDom.map(function (dd, di) {
+      return {
+        name: dd.name, test: dd.test,
+        bars: MODELS.map(function (m, mi) {
+          var s = sds[di][mi];
+          return { h: Math.max(2, Math.round(s / (maxBy[dd.test] || 1) * 100)), color: m.color, label: f2(s) };
+        })
+      };
+    });
+
+    // 03 Model comparison
+    var PAIRS = [[0, 1], [0, 2], [1, 2]];
+    var pairs = PAIRS.map(function (p) { return { label: MODELS[p[0]].short + ' vs ' + MODELS[p[1]].short }; });
+    var matrix = allDom.map(function (dd) {
+      return {
+        name: dd.name, test: dd.test,
+        cells: PAIRS.map(function (p) {
+          var a = vals(MODELS[p[0]], dd), b = vals(MODELS[p[1]], dd);
+          var pooled = Math.sqrt(((a.length - 1) * sd(a) * sd(a) + (b.length - 1) * sd(b) * sd(b)) / (a.length + b.length - 2));
+          var raw = mean(a) - mean(b);
+          if (pooled < 1e-9) {
+            if (Math.abs(raw) < 1e-9) return { value: 'no spread', who: 'identical in every run', bg: '#1B212A', fg: '#B9C2CE' };
+            var fixedHi = MODELS[raw > 0 ? p[0] : p[1]], fc = tint(fixedHi.color, 0.92);
+            return { value: 'no spread', who: fixedHi.short + ' +' + f2(Math.abs(raw)) + ', every run', bg: fc.bg, fg: fc.fg };
+          }
+          var dv = raw / pooled, ad = Math.abs(dv);
+          if (ad < 0.2) return { value: f2(ad), who: 'about equal', bg: '#1B212A', fg: '#B9C2CE' };
+          var hiM = MODELS[dv > 0 ? p[0] : p[1]], c = tint(hiM.color, 0.14 + 0.78 * Math.min(1, ad / 2.5));
+          return { value: f2(ad), who: hiM.short + ' +' + f2(Math.abs(raw)) + ' pts', bg: c.bg, fg: c.fg };
+        })
+      };
+    });
+
+    // 04 Answer quality
+    var metric = function (title, note, key, lo, hi, ticks, fmt, ref) {
+      return {
+        title: title, note: note,
+        ticks: ticks.map(function (v) { return { x: pos(v, lo, hi), label: fmt(v, true) }; }),
+        lanes: MODELS.map(function (m) {
+          var v = runs[m.key].map(function (r) { return r[key]; });
+          var mn = Math.min.apply(null, v), mx = Math.max.apply(null, v);
+          return {
+            name: m.short, color: m.color, text: m.text, label: fmt(mean(v), false),
+            minX: pos(mn, lo, hi), w: Math.max(0.8, pos(mx, lo, hi) - pos(mn, lo, hi)), meanX: pos(mean(v), lo, hi),
+            hasRef: ref !== null, refX: ref !== null ? pos(ref, lo, hi) : 0
+          };
+        })
+      };
+    };
+    var fmtCount = function (v, tick) { return tick ? String(v) : v.toFixed(1); };
+    var fmtScale = function (v, tick) { return tick ? String(v) : v.toFixed(2); };
+    var fmtPct = function (v, tick) { return (tick ? String(v) : v.toFixed(0)) + '%'; };
+    var cpAll = 0, cpLow = 0, cpRisk = 0;
+    MODELS.forEach(function (m) { runs[m.key].forEach(function (r) { cpAll += r.contraP; cpLow += r.contraPLow; cpRisk += r.contraPRiskLow; }); });
+    var pidContraNote = 'The same check on PID-5, out of 116 pairs. Our own rule, not an official scale. ' +
+      (cpAll ? Math.round(100 * cpLow / cpAll) + '% of flagged pairs are two “false” answers, mostly in Risk Taking (' + Math.round(100 * cpRisk / cpAll) +
+        '%): rejecting both a statement about liking risk and one about never taking risks is a consistent middle position, not a contradiction. Pairs with two “true” answers average ' +
+        (Math.round(10 * (cpAll - cpLow) / 30) / 10) + ' per run.' : '');
+    var quality = [
+      metric('Contradictions · BFI-2', 'Pairs of opposite statements answered the same way, out of 60 pairs. Our own rule, not an official scale.', 'contraB', 0, 60, [0, 15, 30, 45, 60], fmtCount, null),
+      metric('Contradictions · PID-5', pidContraNote, 'contraP', 0, 116, [0, 30, 60, 90, 116], fmtCount, null),
+      metric('Yes-saying · BFI-2', 'Average raw answer before reversing. The line at 3.0 means no lean toward agreeing or disagreeing.', 'yes', 1, 5, [1, 2, 3, 4, 5], fmtScale, 3),
+      metric('Fence-sitting · BFI-2', 'Share of answers that were 3, the neutral option.', 'fence', 0, 100, [0, 25, 50, 75, 100], fmtPct, null)
+    ];
+
+    // 05 Cross-test agreement
+    var fmtR = function (r) { return r === null ? 'no spread' : (r >= 0 ? '+' : '−') + Math.abs(r).toFixed(2); };
+    var span = function (a) { var lo = Math.min.apply(null, a), hi = Math.max.apply(null, a), pad = Math.max(0.05, (hi - lo) * 0.12); return [lo - pad, hi + pad]; };
+    var CROSS = [{ b: 3, p: 0, sign: 1 }, { b: 0, p: 1, sign: -1 }, { b: 1, p: 2, sign: -1 }, { b: 2, p: 3, sign: -1 }];
+    var scatter = CROSS.map(function (c) {
+      var xs = [], ys = [], cols = [];
+      MODELS.forEach(function (m) { runs[m.key].forEach(function (r) { xs.push(r.bfiDom[c.b]); ys.push(r.pidDom[c.p]); cols.push(m.color); }); });
+      var xr = span(xs), yr = span(ys), rAll = corr(xs, ys);
+      var ok = rAll !== null && (rAll > 0 ? 1 : -1) === c.sign;
+      return {
+        title: BFI[c.b].name + ' × ' + PID[c.p].name,
+        expected: c.sign > 0 ? 'Expected: rise together' : 'Expected: move in opposite directions',
+        xName: 'BFI-2 ' + BFI[c.b].name + ' →', yName: 'PID-5 ' + PID[c.p].name + ' →',
+        xLo: f2(xr[0]), xHi: f2(xr[1]), yLo: f2(yr[0]), yHi: f2(yr[1]),
+        dots: xs.map(function (x, i) { return { x: pos(x, xr[0], xr[1]), y: pos(ys[i], yr[0], yr[1]), color: cols[i] }; }),
+        rAll: fmtR(rAll),
+        ok: ok,
+        match: ok ? 'Matches expected direction' : 'Does not match',
+        badgeBg: ok ? LIGHT : 'transparent', badgeFg: ok ? DARK : LIGHT, badgeBorder: ok ? LIGHT : '#6B7583',
+        perModel: MODELS.map(function (m) {
+          var x = runs[m.key].map(function (r) { return r.bfiDom[c.b]; }), y = runs[m.key].map(function (r) { return r.pidDom[c.p]; });
+          return { name: m.short, text: m.text, r: fmtR(corr(x, y)) };
+        })
+      };
+    });
+
+    // Key findings: derived from the figures above, nothing new
+    var bySame = MODELS.map(function (m) {
+      var a = items[m.key].bfi.concat(items[m.key].pid);
+      return { m: m, pct: Math.round(100 * a.filter(function (k) { return k === 1; }).length / a.length) };
+    }).sort(function (a, b) { return b.pct - a.pct; });
+    var steadiest = bySame[0], loosest = bySame[bySame.length - 1];
+    var biggest = null;
+    allDom.forEach(function (dd) {
+      PAIRS.forEach(function (p) {
+        var a = vals(MODELS[p[0]], dd), b = vals(MODELS[p[1]], dd);
+        var pooled = Math.sqrt(((a.length - 1) * sd(a) * sd(a) + (b.length - 1) * sd(b) * sd(b)) / (a.length + b.length - 2));
+        if (pooled < 1e-9) return;
+        var dv = (mean(a) - mean(b)) / pooled;
+        if (!biggest || Math.abs(dv) > biggest.ad) {
+          biggest = { ad: Math.abs(dv), dd: dd, hi: MODELS[dv > 0 ? p[0] : p[1]], lo: MODELS[dv > 0 ? p[1] : p[0]],
+            hiMean: Math.max(mean(a), mean(b)), loMean: Math.min(mean(a), mean(b)) };
+        }
+      });
+    });
+    var matches = scatter.filter(function (s) { return s.ok; }).length, misses = 4 - matches;
+    var missed = CROSS.filter(function (c, i) { return !scatter[i].ok; });
+    var agreeDetail;
+    if (misses === 0) {
+      agreeDetail = 'Every overlapping trait pair moves in the expected direction across all runs.';
+    } else {
+      agreeDetail = missed.map(function (c) { return BFI[c.b].name + ' × ' + PID[c.p].name; }).join(' and ') +
+        (misses === 1 ? ' does not' : ' do not') + ' move in the expected direction across all runs.';
+      if (misses === 1) {
+        var xs = [];
+        MODELS.forEach(function (m) { runs[m.key].forEach(function (r) { xs.push(r.bfiDom[missed[0].b]); }); });
+        var xlo = Math.min.apply(null, xs), xhi = Math.max.apply(null, xs);
+        if (xhi - xlo <= 0.25) agreeDetail += ' Every run puts ' + BFI[missed[0].b].name + ' between ' + f2(xlo) + ' and ' + f2(xhi) + ' on a 1–5 scale, which leaves almost nothing to line up.';
+      }
+    }
+    var allYes = [], allFence = [], allContra = [];
+    MODELS.forEach(function (m) { runs[m.key].forEach(function (r) { allYes.push(r.yes); allFence.push(r.fence); allContra.push(r.contraB); }); });
+    var yesM = mean(allYes), fenceM = mean(allFence);
+    var lean = yesM > 3.15 ? 'Leans toward agreeing' : (yesM < 2.85 ? 'Leans toward disagreeing' : 'Balanced');
+    var scaleOf = { 'BFI-2': '1–5', 'PID-5': '0–3' };
+    var findings = [
+      {
+        label: 'Steadiest model', value: steadiest.m.name, color: steadiest.m.text,
+        detail: steadiest.pct + '% of its 280 statements got the same answer in all 10 runs. Most variable: ' + loosest.m.name + ' at ' + loosest.pct + '%.',
+        where: 'Section 02'
+      },
+      {
+        label: 'Largest gap between models', value: biggest ? biggest.dd.name : 'None', color: LIGHT,
+        detail: biggest ? biggest.hi.name + ' averages ' + f2(biggest.hiMean) + ' and ' + biggest.lo.name + ' ' + f2(biggest.loMean) + ' on the ' + biggest.dd.test + ' ' + scaleOf[biggest.dd.test] +
+          ' scale. A small gap in points, but runs barely vary, so it is ' + f2(biggest.ad) + ' run-to-run spreads wide.' : 'No domain shows any spread, so gaps cannot be sized.',
+        where: 'Section 03'
+      },
+      {
+        label: 'Do the two tests agree?', value: matches + ' of 4', color: LIGHT,
+        detail: agreeDetail,
+        where: 'Section 05'
+      },
+      {
+        label: 'Answer style', value: lean + (fenceM < 10 ? ' and decisive' : ''), color: LIGHT,
+        detail: 'Average raw BFI-2 answer ' + f2(yesM) + ' (3.0 = no lean) · ' + Math.round(fenceM) + '% neutral answers · ' + (Math.round(mean(allContra) * 100) / 100) + ' BFI-2 contradictions per run out of 60 pairs.',
+        where: 'Section 04'
+      }
+    ];
+
+    return { findings: findings, profiles: profiles, fingerprints: fingerprints, consistency: consistency, barcodes: barcodes, spread: spread, pairs: pairs, matrix: matrix, quality: quality, scatter: scatter };
+  }
+}
+
+(function () {
+  var mount = document.getElementById('dash-mount');
+  var tpl = document.getElementById('dash-tpl');
+  var HOLE = /\{\{\s*([\w.$]+)\s*\}\}/g;
+  function get(scope, path) {
+    return path.split('.').reduce(function (o, k) { return o == null ? undefined : o[k]; }, scope);
+  }
+  function interp(str, scope) {
+    return str.replace(HOLE, function (_, p) { var v = get(scope, p); return v == null ? '' : String(v); });
+  }
+  function value(str, scope) {
+    var m = /^\s*\{\{\s*([\w.$]+)\s*\}\}\s*$/.exec(str || '');
+    return m ? get(scope, m[1]) : undefined;
+  }
+  function render(node, scope, out) {
+    node.childNodes.forEach(function (ch) {
+      if (ch.nodeType === 3) {
+        out.appendChild(document.createTextNode(interp(ch.nodeValue, scope)));
+      } else if (ch.nodeType === 1) {
+        var tag = ch.localName;
+        if (tag === 'sc-for') {
+          var list = value(ch.getAttribute('list'), scope) || [];
+          var as = ch.getAttribute('as');
+          list.forEach(function (item) {
+            var s = Object.create(scope); s[as] = item;
+            render(ch, s, out);
+          });
+        } else if (tag === 'sc-if') {
+          if (value(ch.getAttribute('value'), scope)) render(ch, scope, out);
+        } else {
+          var el = document.createElement(tag);
+          for (var i = 0; i < ch.attributes.length; i++) {
+            var a = ch.attributes[i];
+            el.setAttribute(a.name, interp(a.value, scope));
+          }
+          render(ch, scope, el);
+          out.appendChild(el);
+        }
+      }
+    });
+  }
+  try {
+    var vals = new Component().renderVals();
+    var frag = document.createDocumentFragment();
+    render(tpl.content, vals, frag);
+    mount.appendChild(frag);
+  } catch (e) {
+    mount.textContent = 'The dashboard could not be drawn: ' + e.message;
+  }
+})();
+
+</script>
